@@ -1,4 +1,4 @@
-package com.example.vse_back.exceptions.ExceptionHandler;
+package com.example.vse_back.exceptions.exception_handler;
 
 import com.example.vse_back.exceptions.*;
 import org.springframework.http.HttpHeaders;

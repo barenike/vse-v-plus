@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ public class OrderRecordEntity {
     @Column(name = "product_id", nullable = false)
     private UUID productId;
 
+    @Min(1)
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

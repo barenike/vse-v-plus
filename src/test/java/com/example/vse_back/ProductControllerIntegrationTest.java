@@ -39,12 +39,12 @@ public class ProductControllerIntegrationTest {
 
     @Test
     public void createProduct_Returns_201() throws Exception {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Juuur.jpg")) {
-            MockMultipartFile file = new MockMultipartFile("file", "Juuur.jpg", "application/json", inputStream);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-            parameters.add("name", "Juuur");
+            parameters.add("name", "test_image");
             parameters.add("price", "10");
-            parameters.add("description", "Great juuur");
+            parameters.add("description", "Great test_image!");
             parameters.add("amount", "100");
             mvc.perform(MockMvcRequestBuilders.multipart("/admin/product")
                             .file(file)

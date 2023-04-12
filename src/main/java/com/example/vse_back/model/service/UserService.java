@@ -24,7 +24,11 @@ public class UserService {
     private final PasswordResetTokenService passwordResetTokenService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, VerificationTokenService verificationTokenService, PasswordResetTokenService passwordResetTokenService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       VerificationTokenService verificationTokenService,
+                       PasswordResetTokenService passwordResetTokenService,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.verificationTokenService = verificationTokenService;

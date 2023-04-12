@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,6 +35,7 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Min(0)
     @Column(name = "user_balance", nullable = false)
     private Integer userBalance;
 

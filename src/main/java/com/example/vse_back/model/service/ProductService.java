@@ -26,7 +26,12 @@ public class ProductService {
 
     public List<ProductResponse> getAllProducts() {
         List<ProductEntity> products = productRepository.findAll();
-        return products.stream().map(product -> new ProductResponse(product.getId().toString(), product.getName(), product.getPrice(), product.getImageUrl())).collect(Collectors.toList());
+        return products.stream().map(product -> new ProductResponse(
+                product.getId().toString(),
+                product.getName(),
+                product.getPrice(),
+                product.getImageUrl()
+        )).collect(Collectors.toList());
     }
 
     public ProductEntity getProduct(UUID id) {

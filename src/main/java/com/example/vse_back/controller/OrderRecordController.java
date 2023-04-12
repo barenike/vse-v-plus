@@ -40,7 +40,7 @@ public class OrderRecordController {
     public ResponseEntity<?> getOrderRecordById(@PathVariable(name = "orderRecordId") UUID orderRecordId) {
         List<OrderRecordEntity> orderRecords = orderRecordService.findAllOrderRecordsById(orderRecordId);
         if (orderRecords.isEmpty()) {
-            throw new OrderRecordIsNotFoundException();
+            throw new OrderRecordIsNotFoundException(orderRecordId);
         }
         return new ResponseEntity<>(orderRecords, HttpStatus.OK);
     }

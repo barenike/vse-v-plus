@@ -7,7 +7,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class ProductResponse {
     private String id;
+
     private String name;
+
     private Integer price;
+
     private String imageUrl;
 }

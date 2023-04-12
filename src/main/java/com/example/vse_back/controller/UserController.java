@@ -35,8 +35,7 @@ public class UserController {
                           PasswordResetTokenService passwordResetTokenService,
                           VerificationTokenService verificationTokenService,
                           JwtProvider jwtProvider,
-                          ApplicationEventPublisher eventPublisher)
-    {
+                          ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.verificationTokenService = verificationTokenService;

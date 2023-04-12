@@ -27,9 +27,9 @@ public class TestService {
     // In production change to @chelpipegroup.com
     final String email = "lilo-games@mail.ru";
     final String password = "123456Aa";
-    final String phoneNumber = "+79021012002";
-    final String firstName = "Arkel";
-    final String lastName = "Luvare";
+    final String phoneNumber = "+77777777777";
+    final String firstName = "Adam";
+    final String lastName = "Smith";
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -96,12 +96,12 @@ public class TestService {
     }
 
     void createProduct() throws Exception {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Juuur.jpg")) {
-            MockMultipartFile file = new MockMultipartFile("file", "Juuur.jpg", "application/json", inputStream);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-            parameters.add("name", "Juuur");
+            parameters.add("name", "test_image");
             parameters.add("price", "10");
-            parameters.add("description", "Great juuur");
+            parameters.add("description", "Great test_image!");
             parameters.add("amount", "100");
             mvc.perform(MockMvcRequestBuilders.multipart("/admin/product")
                     .file(file)
@@ -115,7 +115,7 @@ public class TestService {
         String productId;
         productId = productResponseList
                 .stream()
-                .filter(productResponse -> productResponse.getName().equals("Juuur"))
+                .filter(productResponse -> productResponse.getName().equals("test_image"))
                 .findFirst()
                 .map(ProductResponse::getId)
                 .orElse(null);
@@ -123,7 +123,7 @@ public class TestService {
     }
 
     void deleteProduct() {
-        dropboxService.delete("/Juuur.jpg");
+        dropboxService.delete("/test_image.jpg");
     }
 
     void createOrder() throws Exception {

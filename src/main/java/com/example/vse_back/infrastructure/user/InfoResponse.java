@@ -7,10 +7,16 @@ import lombok.Data;
 @AllArgsConstructor
 public class InfoResponse {
     private String uuid;
+
     private Integer roleId;
+
     private String email;
+
     private Integer userBalance;
+
     private String phoneNumber;
+
     private String firstName;
+
     private String secondName;
 }

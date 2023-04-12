@@ -7,12 +7,12 @@ import com.example.vse_back.infrastructure.order.OrderCreationDetails;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
 import com.example.vse_back.model.entity.*;
 import com.example.vse_back.model.repository.OrderRepository;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +24,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final JwtProvider jwtProvider;
 
-    public OrderService(UserService userService, ProductService productService, OrderRecordService orderRecordService, OrderRepository orderRepository, JwtProvider jwtProvider) {
+    public OrderService(UserService userService,
+                        ProductService productService,
+                        OrderRecordService orderRecordService,
+                        OrderRepository orderRepository,
+                        JwtProvider jwtProvider) {
         this.userService = userService;
         this.productService = productService;
         this.orderRecordService = orderRecordService;
@@ -32,10 +36,10 @@ public class OrderService {
         this.jwtProvider = jwtProvider;
     }
 
-    protected static Date getCurrentYekaterinburgDate() {
-        DateTimeZone zoneYekaterinburg = DateTimeZone.forID("Asia/Yekaterinburg");
-        DateTime now = DateTime.now(zoneYekaterinburg);
-        return now.toDate();
+    private LocalDateTime getCurrentMoscowDate() {
+        ZoneId zone = ZoneId.of("Europe/Moscow");
+        ZonedDateTime date = ZonedDateTime.now(zone);
+        return date.toLocalDateTime();
     }
 
     @Transactional
@@ -45,7 +49,7 @@ public class OrderService {
         String userId = jwtProvider.getUserIdFromToken(token.substring(7));
         UserEntity user = userService.findByUserId(userId);
         order.setUserId(UUID.fromString(userId));
-        order.setCreationDate(getCurrentYekaterinburgDate());
+        order.setCreationDate(getCurrentMoscowDate());
         int total = 0;
         for (OrderCreationDetails orderCreationDetails : orderCreationRequest.getOrderCreationDetails()) {
             String productId = orderCreationDetails.getProductId();
@@ -71,9 +75,9 @@ public class OrderService {
             OrderEntity order = orderRepository.getById(id);
             order.setStatus(OrderStatusEnum.valueOf(status).toString());
             if (OrderStatusEnum.SHIPPED.toString().equals(status)) {
-                order.setShippingDate(getCurrentYekaterinburgDate());
+                order.setShippingDate(getCurrentMoscowDate());
             } else if (OrderStatusEnum.COMPLETED.toString().equals(status)) {
-                order.setCompletionDate(getCurrentYekaterinburgDate());
+                order.setCompletionDate(getCurrentMoscowDate());
             }
             orderRepository.save(order);
             return true;

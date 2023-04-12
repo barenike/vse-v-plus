@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -27,12 +28,14 @@ public class ProductEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Min(1)
     @Column(name = "price", nullable = false)
     private Integer price;
 
     @Column(name = "description")
     private String description;
 
+    @Min(1)
     @Column(name = "amount", nullable = false)
     private Integer amount;
 

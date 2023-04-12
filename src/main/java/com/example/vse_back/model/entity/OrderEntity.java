@@ -8,7 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,13 +29,13 @@ public class OrderEntity {
     private UUID userId;
 
     @Column(name = "creation_date", nullable = false)
-    private Date creationDate;
+    private LocalDateTime creationDate;
 
     @Column(name = "shipping_date")
-    private Date shippingDate;
+    private LocalDateTime shippingDate;
 
     @Column(name = "completion_date")
-    private Date completionDate;
+    private LocalDateTime completionDate;
 
     @Column(name = "total", nullable = false)
     private Integer total;
