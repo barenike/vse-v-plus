@@ -21,7 +21,6 @@ public class UserBalanceChangeRecordsController {
         this.jwtProvider = jwtProvider;
     }
 
-    // Test is urgently needed
     @GetMapping("/user/balance_change_records")
     public ResponseEntity<List<UserBalanceChangeRecordsEntity>> getMyOrderRecordsByOrderId(@RequestHeader(name = "Authorization") String token) {
         String userId = jwtProvider.getUserIdFromRawToken(token);
