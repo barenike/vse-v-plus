@@ -2,7 +2,6 @@ package com.example.vse_back.model.service;
 
 import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
-import com.example.vse_back.exceptions.ProductIsNotFoundException;
 import com.example.vse_back.infrastructure.order.OrderCreationDetails;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
 import com.example.vse_back.model.entity.*;
@@ -10,11 +9,10 @@ import com.example.vse_back.model.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static com.example.vse_back.utils.Util.getCurrentMoscowDate;
 
 @Service
 public class OrderService {
@@ -36,27 +34,18 @@ public class OrderService {
         this.jwtProvider = jwtProvider;
     }
 
-    private LocalDateTime getCurrentMoscowDate() {
-        ZoneId zone = ZoneId.of("Europe/Moscow");
-        ZonedDateTime date = ZonedDateTime.now(zone);
-        return date.toLocalDateTime();
-    }
-
     @Transactional
-    public void create(OrderCreationRequest orderCreationRequest, String token) {
+    public void createOrder(OrderCreationRequest orderCreationRequest, String token) {
         OrderEntity order = new OrderEntity();
         order.setStatus(OrderStatusEnum.CREATED.toString());
-        String userId = jwtProvider.getUserIdFromToken(token.substring(7));
-        UserEntity user = userService.findByUserId(userId);
+        String userId = jwtProvider.getUserIdFromRawToken(token);
+        UserEntity user = userService.getUserById(userId);
         order.setUserId(UUID.fromString(userId));
         order.setCreationDate(getCurrentMoscowDate());
         int total = 0;
         for (OrderCreationDetails orderCreationDetails : orderCreationRequest.getOrderCreationDetails()) {
             String productId = orderCreationDetails.getProductId();
-            ProductEntity product = productService.getProduct(UUID.fromString(productId));
-            if (product == null) {
-                throw new ProductIsNotFoundException(productId);
-            }
+            ProductEntity product = productService.getProductById(UUID.fromString(productId));
             total += product.getPrice() * orderCreationDetails.getQuantity();
         }
         Integer userBalance = user.getUserBalance();
@@ -65,12 +54,12 @@ public class OrderService {
         }
         order.setTotal(total);
         orderRepository.save(order);
-        orderRecordService.create(orderCreationRequest.getOrderCreationDetails(), order.getId());
+        orderRecordService.createOrderRecord(orderCreationRequest.getOrderCreationDetails(), order.getId());
         productService.changeProductAmount(orderCreationRequest.getOrderCreationDetails());
-        userService.changeUserBalance(user, userBalance - total);
+        userService.changeUserBalance(user, userBalance - total, "Оформление заказа");
     }
 
-    public boolean changeStatus(UUID id, String status) {
+    public boolean changeOrderStatus(UUID id, String status) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getById(id);
             order.setStatus(OrderStatusEnum.valueOf(status).toString());
@@ -86,40 +75,37 @@ public class OrderService {
         }
     }
 
-    public List<OrderEntity> findAllOrders() {
+    public List<OrderEntity> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    public List<OrderEntity> findOrdersByUserId(UUID userId) {
+    public List<OrderEntity> getOrdersByUserId(UUID userId) {
         return orderRepository.findByUserId(userId);
     }
 
     @Transactional
-    public boolean delete(UUID id) {
+    public boolean deleteOrderById(UUID id) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getById(id);
             if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
                 return false;
             }
             String userId = String.valueOf(order.getUserId());
-            UserEntity user = userService.findByUserId(userId);
+            UserEntity user = userService.getUserById(userId);
             Integer userBalance = user.getUserBalance();
             Integer total = order.getTotal();
-            List<OrderRecordEntity> orderRecords = orderRecordService.findOrderRecordsByOrderId(id);
+            List<OrderRecordEntity> orderRecords = orderRecordService.getOrderRecordsByOrderId(id);
             for (OrderRecordEntity orderRecord : orderRecords) {
-                ProductEntity product = productService.getProduct(orderRecord.getProductId());
-                if (product == null) {
-                    throw new ProductIsNotFoundException(orderRecord.getProductId().toString());
-                }
+                ProductEntity product = productService.getProductById(orderRecord.getProductId());
                 Integer quantity = orderRecord.getQuantity();
-                boolean isDeleted = orderRecordService.delete(orderRecord.getId());
+                boolean isDeleted = orderRecordService.deleteOrderRecordById(orderRecord.getId());
                 if (!isDeleted) {
                     return false;
                 }
                 productService.changeProductAmount(product, product.getAmount() + quantity);
             }
             orderRepository.deleteById(id);
-            userService.changeUserBalance(user, userBalance + total);
+            userService.changeUserBalance(user, userBalance + total, "Отмена заказа");
             return true;
         } else {
             return false;

@@ -22,7 +22,7 @@ public class OrderRecordController {
 
     @GetMapping("/user/order_records/{orderId}")
     public ResponseEntity<List<OrderRecordEntity>> getMyOrderRecordsByOrderId(@PathVariable(name = "orderId") UUID orderId) {
-        final List<OrderRecordEntity> orders = orderRecordService.findOrderRecordsByOrderId(orderId);
+        final List<OrderRecordEntity> orders = orderRecordService.getOrderRecordsByOrderId(orderId);
         return orders != null && !orders.isEmpty()
                 ? new ResponseEntity<>(orders, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -30,7 +30,7 @@ public class OrderRecordController {
 
     @GetMapping("/admin/order_records")
     public ResponseEntity<List<OrderRecordEntity>> getOrderRecords() {
-        List<OrderRecordEntity> orderRecords = orderRecordService.findAllOrderRecords();
+        List<OrderRecordEntity> orderRecords = orderRecordService.getAllOrderRecords();
         return orderRecords != null && !orderRecords.isEmpty()
                 ? new ResponseEntity<>(orderRecords, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);
@@ -38,7 +38,7 @@ public class OrderRecordController {
 
     @GetMapping("/admin/order_records/{orderRecordId}")
     public ResponseEntity<?> getOrderRecordById(@PathVariable(name = "orderRecordId") UUID orderRecordId) {
-        List<OrderRecordEntity> orderRecords = orderRecordService.findAllOrderRecordsById(orderRecordId);
+        List<OrderRecordEntity> orderRecords = orderRecordService.getAllOrderRecordsById(orderRecordId);
         if (orderRecords.isEmpty()) {
             throw new OrderRecordIsNotFoundException(orderRecordId);
         }

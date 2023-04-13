@@ -13,4 +13,7 @@ public class UserBalanceRequest {
     @Min(0)
     @NotNull
     private Integer userBalance;
+
+    @NotNull
+    private String cause;
 }

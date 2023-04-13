@@ -79,7 +79,7 @@ public class OrderRecordControllerIntegrationTest {
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
-        List<OrderRecordEntity> orderRecords = orderRecordService.findOrderRecordsByOrderId(UUID.fromString(testService.getOrderId()));
+        List<OrderRecordEntity> orderRecords = orderRecordService.getOrderRecordsByOrderId(UUID.fromString(testService.getOrderId()));
         mvc.perform(MockMvcRequestBuilders.get("/admin/order_records/{orderRecordId}", orderRecords.get(0).getId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());

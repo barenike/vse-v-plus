@@ -46,4 +46,8 @@ public class JwtProvider {
         Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
+
+    public String getUserIdFromRawToken(String token) {
+        return getUserIdFromToken(token.substring(7));
+    }
 }

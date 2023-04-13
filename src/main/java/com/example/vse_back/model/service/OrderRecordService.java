@@ -17,7 +17,7 @@ public class OrderRecordService {
         this.orderRecordRepository = orderRecordRepository;
     }
 
-    public void create(List<OrderCreationDetails> orderCreationDetails, UUID id) {
+    public void createOrderRecord(List<OrderCreationDetails> orderCreationDetails, UUID id) {
         for (OrderCreationDetails details : orderCreationDetails) {
             OrderRecordEntity orderRecord = new OrderRecordEntity();
             orderRecord.setOrderId(id);
@@ -27,20 +27,20 @@ public class OrderRecordService {
         }
     }
 
-    public List<OrderRecordEntity> findAllOrderRecords() {
+    public List<OrderRecordEntity> getAllOrderRecords() {
         return orderRecordRepository.findAll();
     }
 
-    public List<OrderRecordEntity> findOrderRecordsByOrderId(UUID orderId) {
+    public List<OrderRecordEntity> getOrderRecordsByOrderId(UUID orderId) {
         return orderRecordRepository.findByOrderId(orderId);
     }
 
-    public List<OrderRecordEntity> findAllOrderRecordsById(UUID id) {
-        List<OrderRecordEntity> allOrders = findAllOrderRecords();
+    public List<OrderRecordEntity> getAllOrderRecordsById(UUID id) {
+        List<OrderRecordEntity> allOrders = getAllOrderRecords();
         return allOrders.stream().filter(orderRecord -> orderRecord.getId().equals(id)).collect(Collectors.toList());
     }
 
-    public boolean delete(UUID id) {
+    public boolean deleteOrderRecordById(UUID id) {
         if (orderRecordRepository.existsById(id)) {
             orderRecordRepository.deleteById(id);
             return true;

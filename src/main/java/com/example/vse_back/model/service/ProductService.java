@@ -34,11 +34,15 @@ public class ProductService {
         )).collect(Collectors.toList());
     }
 
-    public ProductEntity getProduct(UUID id) {
-        return productRepository.findByProductId(id);
+    public ProductEntity getProductById(UUID id) {
+        ProductEntity product = productRepository.findByProductId(id);
+        if (product == null) {
+            throw new ProductIsNotFoundException(id.toString());
+        }
+        return product;
     }
 
-    public void create(ProductCreationRequest productCreationRequest) {
+    public void createProduct(ProductCreationRequest productCreationRequest) {
         ProductEntity product = new ProductEntity();
         product.setName(productCreationRequest.getName());
         product.setPrice(productCreationRequest.getPrice());
@@ -49,7 +53,7 @@ public class ProductService {
         product.setImagePath(imagePath);
         String imageUrl;
         try {
-            imageUrl = dropboxService.upload(imagePath, productCreationRequest.getFile().getInputStream());
+            imageUrl = dropboxService.uploadFile(imagePath, productCreationRequest.getFile().getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,10 +63,7 @@ public class ProductService {
 
     // Maybe, I will refactor this later
     public void changeProductAmount(String productId, Integer amount) {
-        ProductEntity product = findByProductId(productId);
-        if (product == null) {
-            throw new ProductIsNotFoundException(productId);
-        }
+        ProductEntity product = getProductById(UUID.fromString(productId));
         product.setAmount(amount);
         productRepository.save(product);
     }
@@ -74,16 +75,12 @@ public class ProductService {
 
     public void changeProductAmount(List<OrderCreationDetails> orderCreationDetails) {
         orderCreationDetails.forEach(details -> changeProductAmount(details.getProductId(),
-                findByProductId(details.getProductId()).getAmount() - details.getQuantity()));
+                getProductById(UUID.fromString(details.getProductId())).getAmount() - details.getQuantity()));
     }
 
-    public ProductEntity findByProductId(String productId) {
-        return productRepository.findByProductId(UUID.fromString(productId));
-    }
-
-    public boolean delete(UUID id) {
+    public boolean deleteProductById(UUID id) {
         if (productRepository.existsById(id)) {
-            dropboxService.delete(getProduct(id).getImagePath());
+            dropboxService.deleteFile(getProductById(id).getImagePath());
             productRepository.deleteById(id);
             return true;
         }

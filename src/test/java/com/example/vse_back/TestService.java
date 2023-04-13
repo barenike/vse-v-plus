@@ -58,14 +58,15 @@ public class TestService {
     }
 
     void enableUser() {
-        userService.enableUser(userService.findByEmail(email));
+        userService.enableUser(userService.getUserByEmail(email));
     }
 
     void setUserBalance(Integer balance) throws Exception {
-        UserEntity user = userService.findByEmail(email);
+        UserEntity user = userService.getUserByEmail(email);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId());
         jo.put("userBalance", balance);
+        jo.put("cause", "Тест");
         mvc.perform(MockMvcRequestBuilders.post("/admin/user_balance")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + getAdminJWT())
@@ -124,7 +125,7 @@ public class TestService {
     }
 
     void deleteProduct() {
-        dropboxService.delete("/test_image.jpg");
+        dropboxService.deleteFile("/test_image.jpg");
     }
 
     void createOrder() throws Exception {
@@ -135,7 +136,7 @@ public class TestService {
     }
 
     String getOrderId() throws Exception {
-        List<OrderEntity> orders = orderService.findOrdersByUserId(UUID.fromString(jwtProvider.getUserIdFromToken(getUserJWT())));
+        List<OrderEntity> orders = orderService.getOrdersByUserId(UUID.fromString(jwtProvider.getUserIdFromToken(getUserJWT())));
         return orders.get(0).getId().toString();
     }
 }

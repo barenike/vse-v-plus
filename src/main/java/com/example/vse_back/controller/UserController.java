@@ -3,8 +3,6 @@ package com.example.vse_back.controller;
 import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.exceptions.NotEnabledUserException;
 import com.example.vse_back.exceptions.TokenIsNotFoundException;
-import com.example.vse_back.exceptions.UserIsNotFoundByEmailException;
-import com.example.vse_back.exceptions.UserIsNotFoundException;
 import com.example.vse_back.infrastructure.user.*;
 import com.example.vse_back.model.entity.PasswordResetTokenEntity;
 import com.example.vse_back.model.entity.UserEntity;
@@ -46,7 +44,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequest registrationRequest,
                                           HttpServletRequest request) {
-        UserEntity user = userService.create(registrationRequest);
+        UserEntity user = userService.createUser(registrationRequest);
         String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl));
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -67,19 +65,18 @@ public class UserController {
 
     @PostMapping("/auth")
     public ResponseEntity<?> auth(@RequestBody @Valid AuthRequest authRequest) {
-        UserEntity user = userService.findByEmailAndPassword(authRequest.getEmail(), authRequest.getPassword());
+        UserEntity user = userService.getUserByEmailAndPassword(authRequest.getEmail(), authRequest.getPassword());
         if (!user.isEnabled()) {
             throw new NotEnabledUserException();
-        } else {
-            String token = jwtProvider.generateToken(String.valueOf(user.getId()));
-            return new ResponseEntity<>(new AuthResponse(token), HttpStatus.OK);
         }
+        String token = jwtProvider.generateToken(String.valueOf(user.getId()));
+        return new ResponseEntity<>(new AuthResponse(token), HttpStatus.OK);
     }
 
     @GetMapping("/info")
     public ResponseEntity<?> getInfo(@RequestHeader(name = "Authorization") String token) {
-        String userId = jwtProvider.getUserIdFromToken(token.substring(7));
-        UserEntity user = userService.findByUserId(userId);
+        String userId = jwtProvider.getUserIdFromRawToken(token);
+        UserEntity user = userService.getUserById(userId);
         return new ResponseEntity<>(new InfoResponse(
                 user.getId().toString(),
                 user.getRoleEntity().getRoleId(),
@@ -96,9 +93,9 @@ public class UserController {
     @PostMapping("/info/change")
     public ResponseEntity<?> changeInfo(@RequestHeader(name = "Authorization") String token,
                                         @RequestBody @Valid UserInfoChangeRequest userInfoChangeRequest) {
-        String userId = jwtProvider.getUserIdFromToken(token.substring(7));
-        UserEntity user = userService.findByUserId(userId);
-        userService.changeInfo(user, userInfoChangeRequest);
+        String userId = jwtProvider.getUserIdFromRawToken(token);
+        UserEntity user = userService.getUserById(userId);
+        userService.changeUserInfo(user, userInfoChangeRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -106,10 +103,7 @@ public class UserController {
     @PostMapping("/reset/password/{email}")
     public ResponseEntity<?> sendResetPasswordMail(@PathVariable(name = "email") String email,
                                                    HttpServletRequest request) {
-        UserEntity user = userService.findByEmail(email);
-        if (user == null) {
-            throw new UserIsNotFoundByEmailException();
-        }
+        UserEntity user = userService.getUserByEmail(email);
         String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
         passwordResetTokenService.resetPassword(user, appUrl);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -124,13 +118,13 @@ public class UserController {
             throw new TokenIsNotFoundException("Reset token", token);
         }
         UserEntity user = passwordResetToken.getUser();
-        userService.changePassword(user, resetPasswordRequest);
+        userService.changeUserPassword(user, resetPasswordRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable(name = "userId") UUID userId) {
-        final boolean isDeleted = userService.delete(userId);
+        final boolean isDeleted = userService.deleteUserById(userId);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
@@ -139,17 +133,14 @@ public class UserController {
     @PostMapping("/admin/user_balance")
     public ResponseEntity<?> changeUserBalance(@RequestBody @Valid UserBalanceRequest userBalanceRequest) {
         String userId = userBalanceRequest.getUserId();
-        UserEntity user = userService.findByUserId(userId);
-        if (user == null) {
-            throw new UserIsNotFoundException(userId);
-        }
-        userService.changeUserBalance(user, userBalanceRequest.getUserBalance());
+        UserEntity user = userService.getUserById(userId);
+        userService.changeUserBalance(user, userBalanceRequest.getUserBalance(), userBalanceRequest.getCause());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/admin/info")
     public ResponseEntity<?> getAllUsersInfo() {
-        List<UserEntity> users = userService.findAllUsers();
+        List<UserEntity> users = userService.getAllUsers();
         List<InfoResponse> result = users.stream().map(user -> new InfoResponse(
                 user.getId().toString(),
                 user.getRoleEntity().getRoleId(),

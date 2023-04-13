@@ -2,7 +2,7 @@ package com.example.vse_back.model.service;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
-import com.example.vse_back.exceptions.ImageDeleteInDropboxFailedException;
+import com.example.vse_back.exceptions.ImageDeleteFromDropboxFailedException;
 import com.example.vse_back.exceptions.ImageUploadToDropboxFailedException;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ public class DropboxService {
         this.client = client;
     }
 
-    public String upload(String filePath, InputStream inputStream) {
+    public String uploadFile(String filePath, InputStream inputStream) {
         try {
             client.files().uploadBuilder(filePath).uploadAndFinish(inputStream);
             return client.sharing().createSharedLinkWithSettings(filePath).getUrl().replaceAll("dl=0", "raw=1");
@@ -26,11 +26,11 @@ public class DropboxService {
         }
     }
 
-    public void delete(String filePath) {
+    public void deleteFile(String filePath) {
         try {
             client.files().deleteV2(filePath);
         } catch (DbxException e) {
-            throw new ImageDeleteInDropboxFailedException(filePath, e);
+            throw new ImageDeleteFromDropboxFailedException(filePath, e);
         }
     }
 }

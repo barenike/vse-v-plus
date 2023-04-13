@@ -179,7 +179,7 @@ public class UserControllerIntegrationTest {
     @Test
     public void deleteUser_Returns_200() throws Exception {
         testService.register();
-        UserEntity user = userService.findByEmail("lilo-games@mail.ru");
+        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
         mvc.perform(MockMvcRequestBuilders
                         .delete("/admin/{userId}", user.getId().toString())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
@@ -198,10 +198,11 @@ public class UserControllerIntegrationTest {
     @Test
     public void changeUserBalance_Returns_200() throws Exception {
         testService.register();
-        UserEntity user = userService.findByEmail("lilo-games@mail.ru");
+        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
         jo.put("userBalance", 200);
+        jo.put("cause", "Тест");
         mvc.perform(MockMvcRequestBuilders.post("/admin/user_balance")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + testService.getAdminJWT())
@@ -215,6 +216,7 @@ public class UserControllerIntegrationTest {
         JSONObject jo = new JSONObject();
         jo.put("userId", "c4f44950-2b80-4cf0-a060-ad99d19cc636");
         jo.put("userBalance", 200);
+        jo.put("cause", "Тест");
         mvc.perform(MockMvcRequestBuilders.post("/admin/user_balance")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + testService.getAdminJWT())

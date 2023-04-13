@@ -17,8 +17,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
-    @ExceptionHandler(ImageDeleteInDropboxFailedException.class)
-    public ResponseEntity<Object> handleImageDeleteInDropboxFailedException(ImageDeleteInDropboxFailedException e, WebRequest request) {
+    @ExceptionHandler(ImageDeleteFromDropboxFailedException.class)
+    public ResponseEntity<Object> handleImageDeleteInDropboxFailedException(ImageDeleteFromDropboxFailedException e, WebRequest request) {
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
@@ -60,11 +60,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(TokenIsNotFoundException.class)
     public ResponseEntity<Object> handleTokenIsNotFoundException(TokenIsNotFoundException e, WebRequest request) {
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(UserIsNotFoundByEmailException.class)
-    public ResponseEntity<Object> handleUserIsNotFoundByEmailException(UserIsNotFoundByEmailException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 
     @ExceptionHandler(UserIsNotFoundException.class)

@@ -1,6 +1,5 @@
 package com.example.vse_back.controller;
 
-import com.example.vse_back.exceptions.ProductIsNotFoundException;
 import com.example.vse_back.infrastructure.product.ProductAmountRequest;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
 import com.example.vse_back.infrastructure.product.ProductResponse;
@@ -25,17 +24,14 @@ public class ProductController {
     // Failure tests is possibly needed.
     @PostMapping("/admin/product")
     public ResponseEntity<?> createProduct(@ModelAttribute @Valid ProductCreationRequest productCreationRequest) {
-        productService.create(productCreationRequest);
+        productService.createProduct(productCreationRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/admin/product_amount")
     public ResponseEntity<?> changeProductAmount(@RequestBody @Valid ProductAmountRequest productAmountRequest) {
         String productId = productAmountRequest.getProductId();
-        ProductEntity product = productService.findByProductId(productId);
-        if (product == null) {
-            throw new ProductIsNotFoundException(productId);
-        }
+        ProductEntity product = productService.getProductById(UUID.fromString(productId));
         productService.changeProductAmount(product, productAmountRequest.getAmount());
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -50,16 +46,13 @@ public class ProductController {
 
     @GetMapping("/products/{productId}")
     public ResponseEntity<?> getProduct(@PathVariable(name = "productId") UUID productId) {
-        final ProductEntity product = productService.getProduct(productId);
-        if (product == null) {
-            throw new ProductIsNotFoundException(productId.toString());
-        }
+        final ProductEntity product = productService.getProductById(productId);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/product/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") UUID productId) {
-        final boolean isDeleted = productService.delete(productId);
+        final boolean isDeleted = productService.deleteProductById(productId);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
