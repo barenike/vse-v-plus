@@ -51,6 +51,13 @@ public class UserEntity {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Column(name = "job_title")
+    private String jobTitle;
+
+    @Column(name = "info_about")
+    private String infoAbout;
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -160,6 +160,23 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
+    public void infoChange_Returns_200() throws Exception {
+        testService.register();
+        testService.enableUser();
+        JSONObject jo = new JSONObject();
+        jo.put("phoneNumber", testService.phoneNumber);
+        jo.put("firstName", testService.firstName);
+        jo.put("lastName", testService.lastName);
+        jo.put("jobTitle", testService.jobTitle);
+        jo.put("infoAbout", testService.infoAbout);
+        mvc.perform(MockMvcRequestBuilders.post("/info/change")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + testService.getUserJWT())
+                        .content(jo.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void deleteUser_Returns_200() throws Exception {
         testService.register();
         UserEntity user = userService.findByEmail("lilo-games@mail.ru");

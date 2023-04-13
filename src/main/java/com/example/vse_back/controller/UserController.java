@@ -87,8 +87,19 @@ public class UserController {
                 user.getUserBalance(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
-                user.getLastName()),
+                user.getLastName(),
+                user.getJobTitle(),
+                user.getInfoAbout()),
                 HttpStatus.OK);
+    }
+
+    @PostMapping("/info/change")
+    public ResponseEntity<?> changeInfo(@RequestHeader(name = "Authorization") String token,
+                                        @RequestBody @Valid UserInfoChangeRequest userInfoChangeRequest) {
+        String userId = jwtProvider.getUserIdFromToken(token.substring(7));
+        UserEntity user = userService.findByUserId(userId);
+        userService.changeInfo(user, userInfoChangeRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Test is needed.
@@ -146,7 +157,9 @@ public class UserController {
                 user.getUserBalance(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
-                user.getLastName()
+                user.getLastName(),
+                user.getJobTitle(),
+                user.getInfoAbout()
         )).toList();
         AdminInfoResponse adminInfoResponse = new AdminInfoResponse(result);
         return adminInfoResponse.getInfoList() != null && !adminInfoResponse.getInfoList().isEmpty()

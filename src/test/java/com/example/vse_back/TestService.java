@@ -30,6 +30,8 @@ public class TestService {
     final String phoneNumber = "+77777777777";
     final String firstName = "Adam";
     final String lastName = "Smith";
+    final String jobTitle = "Economist";
+    final String infoAbout = "Member of the Royal Society of Arts.";
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -40,7 +42,6 @@ public class TestService {
     private DropboxService dropboxService;
     @Autowired
     private OrderService orderService;
-
     @Autowired
     private JwtProvider jwtProvider;
 

@@ -5,6 +5,7 @@ import com.example.vse_back.exceptions.IncorrectEmailException;
 import com.example.vse_back.exceptions.IncorrectPasswordException;
 import com.example.vse_back.infrastructure.user.RegistrationRequest;
 import com.example.vse_back.infrastructure.user.ResetPasswordRequest;
+import com.example.vse_back.infrastructure.user.UserInfoChangeRequest;
 import com.example.vse_back.model.entity.RoleEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.RoleRepository;
@@ -62,6 +63,15 @@ public class UserService {
 
     public void changeUserBalance(UserEntity user, Integer userBalance) {
         user.setUserBalance(userBalance);
+        userRepository.save(user);
+    }
+
+    public void changeInfo(UserEntity user, UserInfoChangeRequest userInfoChangeRequest) {
+        user.setPhoneNumber(userInfoChangeRequest.getPhoneNumber());
+        user.setFirstName(userInfoChangeRequest.getFirstName());
+        user.setLastName(userInfoChangeRequest.getLastName());
+        user.setJobTitle(userInfoChangeRequest.getJobTitle());
+        user.setInfoAbout(userInfoChangeRequest.getInfoAbout());
         userRepository.save(user);
     }
 

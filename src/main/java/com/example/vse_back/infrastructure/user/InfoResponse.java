@@ -19,4 +19,8 @@ public class InfoResponse {
     private String firstName;
 
     private String secondName;
+
+    private String jobTitle;
+
+    private String infoAbout;
 }
