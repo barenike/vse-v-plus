@@ -107,8 +107,8 @@ public class UserController {
 
     // Test is needed.
     @PostMapping("/reset/password/{email}")
-    public ResponseEntity<?> sendResetPasswordMail(@PathVariable(name = "email") String email,
-                                                   HttpServletRequest request) {
+    public ResponseEntity<?> sendPasswordRecoveryEmail(@PathVariable(name = "email") String email,
+                                                       HttpServletRequest request) {
         UserEntity user = userService.getUserByEmail(email);
         String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
         passwordResetTokenService.resetPassword(user, appUrl);
@@ -120,9 +120,6 @@ public class UserController {
     public ResponseEntity<?> resetPassword(@PathVariable("token") String token,
                                            @RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
         PasswordResetTokenEntity passwordResetToken = passwordResetTokenService.validatePasswordResetToken(token);
-        if (passwordResetToken == null) {
-            throw new TokenIsNotFoundException("Reset token", token);
-        }
         UserEntity user = passwordResetToken.getUser();
         userService.changeUserPassword(user, resetPasswordRequest);
         return new ResponseEntity<>(HttpStatus.OK);

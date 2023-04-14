@@ -1,7 +1,6 @@
 package com.example.vse_back;
 
 import com.example.vse_back.model.entity.UserEntity;
-import com.example.vse_back.model.service.UserBalanceChangeRecordsService;
 import com.example.vse_back.model.service.UserService;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -41,9 +40,9 @@ public class UserBalanceChangeRecordsIntegrationTest {
         jo.put("userBalance", 200);
         jo.put("cause", "Тест");
         mvc.perform(MockMvcRequestBuilders.post("/admin/user_balance")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + testService.getAdminJWT())
-                        .content(jo.toString()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + testService.getAdminJWT())
+                .content(jo.toString()));
 
         mvc.perform(MockMvcRequestBuilders.get("/user/balance_change_records")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))

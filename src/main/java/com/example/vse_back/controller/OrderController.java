@@ -56,9 +56,9 @@ public class OrderController {
     }
 
     @Operation(summary = "no parameters - get all orders from all users; " +
-                         "userId parameter - get all orders from the user; " +
-                         "orderId parameter - delete the order; " +
-                         "orderId and status parameters - change the order's status")
+            "userId parameter - get all orders from the user; " +
+            "orderId parameter - delete the order; " +
+            "orderId and status parameters - change the order's status")
     @GetMapping("/admin/orders")
     public ResponseEntity<?> manipulateOrders(@RequestParam(value = "userId", required = false) UUID userId,
                                               @RequestParam(value = "orderId", required = false) UUID orderId,

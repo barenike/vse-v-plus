@@ -1,5 +1,6 @@
 package com.example.vse_back.model.service;
 
+import com.example.vse_back.exceptions.TokenIsNotFoundException;
 import com.example.vse_back.model.entity.PasswordResetTokenEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.PasswordResetTokenRepository;
@@ -20,7 +21,11 @@ public class PasswordResetTokenService {
     }
 
     public PasswordResetTokenEntity validatePasswordResetToken(String token) {
-        return getToken(token);
+        PasswordResetTokenEntity passwordResetToken = getToken(token);
+        if (passwordResetToken == null) {
+            throw new TokenIsNotFoundException("Reset token", token);
+        }
+        return passwordResetToken;
     }
 
     public void createToken(UserEntity user, String token) {
