@@ -8,6 +8,7 @@ import com.example.vse_back.model.service.DropboxService;
 import com.example.vse_back.model.service.OrderService;
 import com.example.vse_back.model.service.ProductService;
 import com.example.vse_back.model.service.UserService;
+import com.example.vse_back.model.service.email_verification.AuthTokenService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ import java.util.UUID;
 public class TestService {
     // In production change to @chelpipegroup.com
     final String email = "lilo-games@mail.ru";
-    final String password = "123456Aa";
+    final String adminEmail = "admin@chelpipegroup.com";
     final String phoneNumber = "+77777777777";
     final String firstName = "Adam";
     final String lastName = "Smith";
@@ -43,22 +44,16 @@ public class TestService {
     @Autowired
     private OrderService orderService;
     @Autowired
+    private AuthTokenService authTokenService;
+    @Autowired
     private JwtProvider jwtProvider;
 
-    void register() throws Exception {
+    void createAccount() throws Exception {
         JSONObject jo = new JSONObject();
         jo.put("email", email);
-        jo.put("password", password);
-        jo.put("phoneNumber", phoneNumber);
-        jo.put("firstName", firstName);
-        jo.put("lastName", lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/register")
+        mvc.perform(MockMvcRequestBuilders.post("/auth/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jo.toString()));
-    }
-
-    void enableUser() {
-        userService.enableUser(userService.getUserByEmail(email));
     }
 
     void setUserBalance(Integer balance) throws Exception {
@@ -73,28 +68,12 @@ public class TestService {
                 .content(jo.toString()));
     }
 
-    String getUserJWT() throws Exception {
-        JSONObject jo = new JSONObject();
-        jo.put("email", email);
-        jo.put("password", password);
-        String jwt = mvc.perform(MockMvcRequestBuilders.post("/auth")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andReturn().getResponse().getContentAsString();
-        jwt = jwt.substring(10, jwt.length() - 2);
-        return jwt;
+    String getUserJWT() {
+        return jwtProvider.generateJwtToken(String.valueOf(userService.getUserByEmail(email).getId()));
     }
 
-    String getAdminJWT() throws Exception {
-        JSONObject jo = new JSONObject();
-        jo.put("email", "admin@chelpipegroup.com");
-        jo.put("password", password);
-        String jwt = mvc.perform(MockMvcRequestBuilders.post("/auth")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andReturn().getResponse().getContentAsString();
-        jwt = jwt.substring(10, jwt.length() - 2);
-        return jwt;
+    String getAdminJWT() {
+        return jwtProvider.generateJwtToken(String.valueOf(userService.getUserByEmail(adminEmail).getId()));
     }
 
     void createProduct() throws Exception {
@@ -135,8 +114,16 @@ public class TestService {
                 .header("Authorization", "Bearer " + getUserJWT()));
     }
 
-    String getOrderId() throws Exception {
-        List<OrderEntity> orders = orderService.getOrdersByUserId(UUID.fromString(jwtProvider.getUserIdFromToken(getUserJWT())));
+    String getOrderId() {
+        List<OrderEntity> orders = orderService.getOrdersByUserId(getUserId());
         return orders.get(0).getId().toString();
+    }
+
+    UUID getUserId() {
+        return userService.getUserByEmail(email).getId();
+    }
+
+    String getToken() {
+        return authTokenService.getTokenBuUserId(getUserId()).getToken();
     }
 }

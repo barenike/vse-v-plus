@@ -39,8 +39,7 @@ public class OrderRecordControllerIntegrationTest {
 
     @Test
     public void getMyOrderRecordsByOrderId_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -52,8 +51,7 @@ public class OrderRecordControllerIntegrationTest {
 
     @Test
     public void getMyOrderRecordsByOrderId_Returns_404() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/user/order_records/{orderId}", "fb96924c-f4a2-4576-8b8b-42b903d9a822")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isNotFound());
@@ -61,8 +59,7 @@ public class OrderRecordControllerIntegrationTest {
 
     @Test
     public void getOrderRecords_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -74,8 +71,7 @@ public class OrderRecordControllerIntegrationTest {
 
     @Test
     public void getOrderRecordById_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -88,8 +84,7 @@ public class OrderRecordControllerIntegrationTest {
 
     @Test
     public void getOrderRecordById_Returns_403_When_OrderRecordIsNotFound() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/admin/order_records/{orderRecordId}", "d6a3e216-fb57-4f0e-81c9-400b25d1b32c")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isForbidden());

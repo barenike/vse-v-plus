@@ -1,6 +1,5 @@
 package com.example.vse_back;
 
-import com.example.vse_back.configuration.jwt.JwtProvider;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
@@ -26,9 +25,6 @@ public class OrderControllerIntegrationTest {
     @Autowired
     private TestService testService;
 
-    @Autowired
-    private JwtProvider jwtProvider;
-
     @AfterEach
     void cleanup() {
         testService.deleteProduct();
@@ -36,8 +32,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void createOrder_Returns_201() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
@@ -50,8 +45,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void createOrder_Returns_403_When_NotEnoughCoins() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(10);
         testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
@@ -64,8 +58,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void createOrder_Returns_403_When_ProductIsNotFound() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
@@ -78,8 +71,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void getMyOrders_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -91,8 +83,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void deleteMyOrder_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -104,8 +95,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void deleteMyOrder_Returns_304_When_OrderDoesNotExist() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -117,8 +107,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_GetAllOrders_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -130,13 +119,12 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_GetOrdersByUserId_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
         mvc.perform(MockMvcRequestBuilders.get("/admin/orders")
-                        .param("userId", jwtProvider.getUserIdFromToken(testService.getUserJWT()))
+                        .param("userId", String.valueOf(testService.getUserId()))
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
         testService.deleteProduct();
@@ -144,8 +132,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_ChangeStatus_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -168,8 +155,7 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_Delete_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();

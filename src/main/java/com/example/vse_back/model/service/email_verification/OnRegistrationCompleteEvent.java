@@ -1,31 +1,17 @@
 package com.example.vse_back.model.service.email_verification;
 
 import com.example.vse_back.model.entity.UserEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
+@Setter
+@Getter
 public class OnRegistrationCompleteEvent extends ApplicationEvent {
     private UserEntity user;
-    private String appUrl;
 
-    public OnRegistrationCompleteEvent(UserEntity user, String appUrl) {
+    public OnRegistrationCompleteEvent(UserEntity user) {
         super(user);
         this.user = user;
-        this.appUrl = appUrl;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-
-    public String getAppUrl() {
-        return appUrl;
-    }
-
-    public void setAppUrl(String appUrl) {
-        this.appUrl = appUrl;
     }
 }

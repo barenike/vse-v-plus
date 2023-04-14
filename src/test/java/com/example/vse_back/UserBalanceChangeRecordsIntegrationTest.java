@@ -32,8 +32,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
 
     @Test
     public void balanceChangeRecords_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());

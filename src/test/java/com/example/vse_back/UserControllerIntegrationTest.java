@@ -31,129 +31,37 @@ public class UserControllerIntegrationTest {
     private TestService testService;
 
     @Test
-    public void register_Returns_201() throws Exception {
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
-        jo.put("password", testService.password);
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isCreated());
+    public void authEmail_Returns_200() throws Exception {
+        testService.createAccount();
     }
 
     @Test
-    public void register_Returns_400_When_EmailPatternIsViolated() throws Exception {
-        JSONObject jo = new JSONObject();
-        jo.put("email", "lilo-games@gmail.ru");
-        jo.put("password", testService.password);
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void register_Returns_400_When_PasswordPatternIsViolated() throws Exception {
+    public void authToken_Returns_200() throws Exception {
+        testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("email", testService.email);
-        jo.put("password", "12345Aa");
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void register_Returns_403_When_EmailAlreadyRegistered() throws Exception {
-        testService.register();
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
-        jo.put("password", testService.password);
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void auth_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
-        jo.put("password", testService.password);
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/auth")
+        jo.put("token", testService.getToken());
+        mvc.perform(MockMvcRequestBuilders.post("/auth/token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jo.toString()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void auth_Returns_403_When_UserIsNotEnabled() throws Exception {
-        testService.register();
+    public void authToken_Returns_403_When_EmailDoesNotMatchToken() throws Exception {
+        testService.createAccount();
         JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
-        jo.put("password", testService.password);
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/auth")
+        jo.put("email", "fake-email@mail.ru");
+        jo.put("token", testService.getToken());
+        mvc.perform(MockMvcRequestBuilders.post("/auth/token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jo.toString()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    public void auth_Returns_401_When_EmailIsIncorrect() throws Exception {
-        testService.register();
-        testService.enableUser();
-        JSONObject jo = new JSONObject();
-        jo.put("email", "ilo-games@mail.ru");
-        jo.put("password", testService.password);
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/auth")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void auth_Returns_401_When_PasswordIsIncorrect() throws Exception {
-        testService.register();
-        testService.enableUser();
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
-        jo.put("password", "123456A");
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        mvc.perform(MockMvcRequestBuilders.post("/auth")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
     public void info_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
@@ -161,8 +69,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void infoChange_Returns_200() throws Exception {
-        testService.register();
-        testService.enableUser();
+        testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("phoneNumber", testService.phoneNumber);
         jo.put("firstName", testService.firstName);
@@ -178,7 +85,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void deleteUser_Returns_200() throws Exception {
-        testService.register();
+        testService.createAccount();
         UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
         mvc.perform(MockMvcRequestBuilders
                         .delete("/admin/{userId}", user.getId().toString())
@@ -188,7 +95,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void deleteUser_Returns_304_When_UserIsNotFound() throws Exception {
-        testService.register();
+        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders
                         .delete("/admin/{userId}", "c4f44950-2b80-4cf0-a060-ad99d19cc636")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
@@ -197,7 +104,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void changeUserBalance_Returns_200() throws Exception {
-        testService.register();
+        testService.createAccount();
         UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
@@ -212,7 +119,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void changeUserBalance_Returns_403_When_UserIsNotFound() throws Exception {
-        testService.register();
+        testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("userId", "c4f44950-2b80-4cf0-a060-ad99d19cc636");
         jo.put("userBalance", 200);
@@ -226,7 +133,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void getAllUsersInfo_Returns_200() throws Exception {
-        testService.register();
+        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info/all_users")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());

@@ -12,58 +12,22 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyRegisteredException.class)
-    public ResponseEntity<Object> handleEmailAlreadyRegisteredException(EmailAlreadyRegisteredException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(ImageDeleteFromDropboxFailedException.class)
-    public ResponseEntity<Object> handleImageDeleteInDropboxFailedException(ImageDeleteFromDropboxFailedException e, WebRequest request) {
+    @ExceptionHandler({ImageDeleteFromDropboxFailedException.class, ImageUploadToDropboxFailedException.class})
+    public ResponseEntity<Object> handleInternalServerErrorException(ImageDeleteFromDropboxFailedException e, WebRequest request) {
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
-    @ExceptionHandler(ImageUploadToDropboxFailedException.class)
-    public ResponseEntity<Object> handleImageUploadToDropboxFailedException(ImageUploadToDropboxFailedException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
-    }
-
-    @ExceptionHandler(IncorrectEmailException.class)
-    public ResponseEntity<Object> handleIncorrectEmailException(IncorrectEmailException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
-    }
-
-    @ExceptionHandler(IncorrectPasswordException.class)
-    public ResponseEntity<Object> handleIncorrectPasswordException(IncorrectPasswordException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
-    }
-
-    @ExceptionHandler(NotEnabledUserException.class)
-    public ResponseEntity<Object> handleNotEnabledUserException(NotEnabledUserException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(NotEnoughCoinsException.class)
-    public ResponseEntity<Object> handleNotEnoughCoinsException(NotEnoughCoinsException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(OrderRecordIsNotFoundException.class)
-    public ResponseEntity<Object> handleOrderRecordIsNotFoundException(OrderRecordIsNotFoundException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(ProductIsNotFoundException.class)
-    public ResponseEntity<Object> handleProductIsNotFoundException(ProductIsNotFoundException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(TokenIsNotFoundException.class)
-    public ResponseEntity<Object> handleTokenIsNotFoundException(TokenIsNotFoundException e, WebRequest request) {
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-
-    @ExceptionHandler(UserIsNotFoundException.class)
-    public ResponseEntity<Object> handleUserIsNotFoundException(UserIsNotFoundException e, WebRequest request) {
+    @ExceptionHandler({
+            AuthTokenIsNotValidException.class,
+            AuthTokenIsNotFoundException.class,
+            AuthTokenHasExpiredException.class,
+            UserIsNotFoundException.class,
+            ProductIsNotFoundException.class,
+            OrderRecordIsNotFoundException.class,
+            NotEnoughCoinsException.class,
+            NotEnabledUserException.class
+    })
+    public ResponseEntity<Object> handleForbiddenException(Exception e, WebRequest request) {
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 

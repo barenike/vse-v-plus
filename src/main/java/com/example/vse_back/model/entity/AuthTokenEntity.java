@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,8 +17,8 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "password_reset_tokens")
-public class PasswordResetTokenEntity {
+@Table(name = "auth_tokens")
+public class AuthTokenEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue(generator = "uuid")
@@ -31,11 +32,14 @@ public class PasswordResetTokenEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        PasswordResetTokenEntity that = (PasswordResetTokenEntity) o;
+        AuthTokenEntity that = (AuthTokenEntity) o;
         return id != null && Objects.equals(id, that.id);
     }
 

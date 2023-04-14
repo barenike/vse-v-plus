@@ -1,80 +1,74 @@
 package com.example.vse_back.controller;
 
 import com.example.vse_back.configuration.jwt.JwtProvider;
-import com.example.vse_back.exceptions.NotEnabledUserException;
-import com.example.vse_back.exceptions.TokenIsNotFoundException;
+import com.example.vse_back.exceptions.AuthTokenHasExpiredException;
+import com.example.vse_back.exceptions.AuthTokenIsNotValidException;
 import com.example.vse_back.infrastructure.user.*;
-import com.example.vse_back.model.entity.PasswordResetTokenEntity;
+import com.example.vse_back.model.entity.AuthTokenEntity;
 import com.example.vse_back.model.entity.UserEntity;
-import com.example.vse_back.model.entity.VerificationTokenEntity;
-import com.example.vse_back.model.service.PasswordResetTokenService;
 import com.example.vse_back.model.service.UserService;
+import com.example.vse_back.model.service.email_verification.AuthTokenService;
 import com.example.vse_back.model.service.email_verification.OnRegistrationCompleteEvent;
-import com.example.vse_back.model.service.email_verification.VerificationTokenService;
+import com.example.vse_back.utils.Util;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 public class UserController {
     private final UserService userService;
-    private final PasswordResetTokenService passwordResetTokenService;
-    private final VerificationTokenService verificationTokenService;
+    private final AuthTokenService authTokenService;
     private final JwtProvider jwtProvider;
     private final ApplicationEventPublisher eventPublisher;
 
     public UserController(UserService userService,
-                          PasswordResetTokenService passwordResetTokenService,
-                          VerificationTokenService verificationTokenService,
+                          AuthTokenService authTokenService,
                           JwtProvider jwtProvider,
                           ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
-        this.passwordResetTokenService = passwordResetTokenService;
-        this.verificationTokenService = verificationTokenService;
+        this.authTokenService = authTokenService;
         this.jwtProvider = jwtProvider;
         this.eventPublisher = eventPublisher;
     }
 
-    @Operation(summary = "Register the user")
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequest registrationRequest,
-                                          HttpServletRequest request) {
-        UserEntity user = userService.createUser(registrationRequest);
-        String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl));
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    // Test is needed.
-    @Operation(summary = "Confirm the registration")
-    @GetMapping("/register/confirm")
-    public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
-        VerificationTokenEntity verificationToken = verificationTokenService.getToken(token);
-        if (verificationToken == null) {
-            throw new TokenIsNotFoundException("Verification token", token);
+    @Operation(summary = "Send a one-time auth token to the email address")
+    @PostMapping("/auth/email")
+    public ResponseEntity<?> sendAuthTokenToEmailAddress(@RequestBody @Valid AuthEmailRequest authEmailRequest) {
+        UserEntity user = userService.getUserByEmail(authEmailRequest.getEmail());
+        if (user == null) {
+            user = userService.createUser(authEmailRequest.getEmail());
         }
-        UserEntity user = verificationToken.getUser();
-        user.setEnabled(true);
-        userService.enableUser(user);
+        authTokenService.deleteByUserId(user.getId());
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(summary = "Get a JWT")
-    @PostMapping("/auth")
-    public ResponseEntity<?> auth(@RequestBody @Valid AuthRequest authRequest) {
-        UserEntity user = userService.getUserByEmailAndPassword(authRequest.getEmail(), authRequest.getPassword());
-        if (!user.isEnabled()) {
-            throw new NotEnabledUserException();
+    @Operation(summary = "Get JWT")
+    @PostMapping("/auth/token")
+    public ResponseEntity<?> authToken(@RequestBody @Valid AuthTokenRequest authEmailRequest) {
+        String email = authEmailRequest.getEmail();
+        AuthTokenEntity authToken = authTokenService.getToken(authEmailRequest.getToken());
+        String token = authToken.getToken();
+        try {
+            if (!authToken.getUser().getEmail().equals(email)) {
+                throw new AuthTokenIsNotValidException(token);
+            } else if (ChronoUnit.MINUTES.between(authToken.getCreationDate(), Util.getCurrentMoscowDate()) > 60) {
+                throw new AuthTokenHasExpiredException(token);
+            } else {
+                UserEntity user = userService.getUserByEmail(email);
+                String jwt = jwtProvider.generateJwtToken(String.valueOf(user.getId()));
+                return new ResponseEntity<>(new AuthResponse(jwt), HttpStatus.OK);
+            }
+        } finally {
+            authTokenService.deleteByToken(token);
         }
-        String token = jwtProvider.generateToken(String.valueOf(user.getId()));
-        return new ResponseEntity<>(new AuthResponse(token), HttpStatus.OK);
     }
 
     @Operation(summary = "Get my profile info")
@@ -102,26 +96,6 @@ public class UserController {
         String userId = jwtProvider.getUserIdFromRawToken(token);
         UserEntity user = userService.getUserById(userId);
         userService.changeUserInfo(user, userInfoChangeRequest);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    // Test is needed.
-    @PostMapping("/reset/password/{email}")
-    public ResponseEntity<?> sendPasswordRecoveryEmail(@PathVariable(name = "email") String email,
-                                                       HttpServletRequest request) {
-        UserEntity user = userService.getUserByEmail(email);
-        String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-        passwordResetTokenService.resetPassword(user, appUrl);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    // Test is needed.
-    @GetMapping("/reset/password/{token}")
-    public ResponseEntity<?> resetPassword(@PathVariable("token") String token,
-                                           @RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
-        PasswordResetTokenEntity passwordResetToken = passwordResetTokenService.validatePasswordResetToken(token);
-        UserEntity user = passwordResetToken.getUser();
-        userService.changeUserPassword(user, resetPasswordRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -32,15 +32,12 @@ public class UserEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Min(0)
     @Column(name = "user_balance", nullable = false)
     private Integer userBalance;
 
-    @Column(name = "enabled", nullable = false)
-    private boolean enabled;
+    @Column(name = "is_enabled", nullable = false)
+    private boolean isEnabled;
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
