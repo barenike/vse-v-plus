@@ -3,6 +3,7 @@ package com.example.vse_back.controller;
 import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.model.entity.UserBalanceChangeRecordsEntity;
 import com.example.vse_back.model.service.UserBalanceChangeRecordsService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +22,9 @@ public class UserBalanceChangeRecordsController {
         this.jwtProvider = jwtProvider;
     }
 
+    @Operation(summary = "Get the list of user balance's change records")
     @GetMapping("/user/balance_change_records")
-    public ResponseEntity<List<UserBalanceChangeRecordsEntity>> getMyOrderRecordsByOrderId(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<List<UserBalanceChangeRecordsEntity>> getMyUserBalanceChangeRecords(@RequestHeader(name = "Authorization") String token) {
         String userId = jwtProvider.getUserIdFromRawToken(token);
         final List<UserBalanceChangeRecordsEntity> userBalanceRecords = userBalanceChangeRecordsService.getUserBalanceChangeRecordsByUserId(userId);
         return userBalanceRecords != null && !userBalanceRecords.isEmpty()

@@ -11,6 +11,7 @@ import com.example.vse_back.model.service.PasswordResetTokenService;
 import com.example.vse_back.model.service.UserService;
 import com.example.vse_back.model.service.email_verification.OnRegistrationCompleteEvent;
 import com.example.vse_back.model.service.email_verification.VerificationTokenService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ public class UserController {
         this.eventPublisher = eventPublisher;
     }
 
+    @Operation(summary = "Register the user")
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequest registrationRequest,
                                           HttpServletRequest request) {
@@ -51,6 +53,7 @@ public class UserController {
     }
 
     // Test is needed.
+    @Operation(summary = "Confirm the registration")
     @GetMapping("/register/confirm")
     public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
         VerificationTokenEntity verificationToken = verificationTokenService.getToken(token);
@@ -63,6 +66,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Get a JWT")
     @PostMapping("/auth")
     public ResponseEntity<?> auth(@RequestBody @Valid AuthRequest authRequest) {
         UserEntity user = userService.getUserByEmailAndPassword(authRequest.getEmail(), authRequest.getPassword());
@@ -73,6 +77,7 @@ public class UserController {
         return new ResponseEntity<>(new AuthResponse(token), HttpStatus.OK);
     }
 
+    @Operation(summary = "Get my profile info")
     @GetMapping("/info")
     public ResponseEntity<?> getInfo(@RequestHeader(name = "Authorization") String token) {
         String userId = jwtProvider.getUserIdFromRawToken(token);
@@ -90,6 +95,7 @@ public class UserController {
                 HttpStatus.OK);
     }
 
+    @Operation(summary = "Change my profile info")
     @PostMapping("/info/change")
     public ResponseEntity<?> changeInfo(@RequestHeader(name = "Authorization") String token,
                                         @RequestBody @Valid UserInfoChangeRequest userInfoChangeRequest) {
@@ -122,6 +128,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete the user")
     @DeleteMapping("/admin/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable(name = "userId") UUID userId) {
         final boolean isDeleted = userService.deleteUserById(userId);
@@ -130,6 +137,7 @@ public class UserController {
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
+    @Operation(summary = "Change the user's balance")
     @PostMapping("/admin/user_balance")
     public ResponseEntity<?> changeUserBalance(@RequestBody @Valid UserBalanceRequest userBalanceRequest) {
         String userId = userBalanceRequest.getUserId();
@@ -138,7 +146,8 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/admin/info")
+    @Operation(summary = "Get profile info of all users")
+    @GetMapping("/info/all_users")
     public ResponseEntity<?> getAllUsersInfo() {
         List<UserEntity> users = userService.getAllUsers();
         List<InfoResponse> result = users.stream().map(user -> new InfoResponse(

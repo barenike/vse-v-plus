@@ -3,6 +3,7 @@ package com.example.vse_back.controller;
 import com.example.vse_back.exceptions.OrderRecordIsNotFoundException;
 import com.example.vse_back.model.entity.OrderRecordEntity;
 import com.example.vse_back.model.service.OrderRecordService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,8 @@ public class OrderRecordController {
         this.orderRecordService = orderRecordService;
     }
 
+    // Security vulnerability - user can see the details of other's orders
+    @Operation(summary = "Get the order records")
     @GetMapping("/user/order_records/{orderId}")
     public ResponseEntity<List<OrderRecordEntity>> getMyOrderRecordsByOrderId(@PathVariable(name = "orderId") UUID orderId) {
         final List<OrderRecordEntity> orders = orderRecordService.getOrderRecordsByOrderId(orderId);
@@ -28,6 +31,7 @@ public class OrderRecordController {
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Get all order records of all users' orders")
     @GetMapping("/admin/order_records")
     public ResponseEntity<List<OrderRecordEntity>> getOrderRecords() {
         List<OrderRecordEntity> orderRecords = orderRecordService.getAllOrderRecords();
@@ -36,6 +40,7 @@ public class OrderRecordController {
                 : new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Get the order record")
     @GetMapping("/admin/order_records/{orderRecordId}")
     public ResponseEntity<?> getOrderRecordById(@PathVariable(name = "orderRecordId") UUID orderRecordId) {
         List<OrderRecordEntity> orderRecords = orderRecordService.getAllOrderRecordsById(orderRecordId);
