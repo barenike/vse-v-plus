@@ -18,14 +18,15 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
     @ExceptionHandler({
-            AuthTokenIsNotValidException.class,
-            AuthTokenIsNotFoundException.class,
-            AuthTokenHasExpiredException.class,
-            UserIsNotFoundException.class,
-            ProductIsNotFoundException.class,
-            OrderRecordIsNotFoundException.class,
+            AuthCodeHasExpiredException.class,
+            AuthCodeIsInvalidException.class,
+            AuthCodeIsNotFoundException.class,
+            NotEnabledUserException.class,
             NotEnoughCoinsException.class,
-            NotEnabledUserException.class
+            OrderRecordIsNotFoundException.class,
+            ProductIsNotFoundException.class,
+            TooManyAuthAttemptsException.class,
+            UserIsNotFoundException.class
     })
     public ResponseEntity<Object> handleForbiddenException(Exception e, WebRequest request) {
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);

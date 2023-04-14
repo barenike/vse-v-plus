@@ -11,6 +11,7 @@ public class ProductCreationRequest {
     @NotNull
     private String name;
 
+    @Min(1)
     @NotNull
     private Integer price;
 

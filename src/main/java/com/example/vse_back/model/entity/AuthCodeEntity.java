@@ -17,16 +17,16 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "auth_tokens")
-public class AuthTokenEntity {
+@Table(name = "auth_codes")
+public class AuthCodeEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @Column(name = "token", nullable = false)
-    private String token;
+    @Column(name = "code", nullable = false, length = 6)
+    private String code;
 
     @OneToOne(targetEntity = UserEntity.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
@@ -35,11 +35,14 @@ public class AuthTokenEntity {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
+    @Column(name = "attempt_count", nullable = false)
+    private Integer attemptCount;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        AuthTokenEntity that = (AuthTokenEntity) o;
+        AuthCodeEntity that = (AuthCodeEntity) o;
         return id != null && Objects.equals(id, that.id);
     }
 

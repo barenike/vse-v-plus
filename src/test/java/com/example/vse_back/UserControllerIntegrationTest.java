@@ -32,28 +32,68 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void authEmail_Returns_200() throws Exception {
-        testService.createAccount();
-    }
-
-    @Test
-    public void authToken_Returns_200() throws Exception {
-        testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("email", testService.email);
-        jo.put("token", testService.getToken());
-        mvc.perform(MockMvcRequestBuilders.post("/auth/token")
+        mvc.perform(MockMvcRequestBuilders.post("/auth/email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jo.toString()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void authToken_Returns_403_When_EmailDoesNotMatchToken() throws Exception {
+    public void authCode_Returns_200() throws Exception {
+        testService.createAccount();
+        JSONObject jo = new JSONObject();
+        jo.put("email", testService.email);
+        jo.put("code", testService.getCode());
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jo.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void authCode_Returns_403_When_ThereIsNoUserWithThisEmail() throws Exception {
         testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("email", "fake-email@mail.ru");
-        jo.put("token", testService.getToken());
-        mvc.perform(MockMvcRequestBuilders.post("/auth/token")
+        jo.put("code", testService.getCode());
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jo.toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    // Can falsely fail with probability 1 / 1 000 000
+    @Test
+    public void authCode_Returns_403_When_AuthCodeIsInvalid() throws Exception {
+        testService.createAccount();
+        JSONObject jo = new JSONObject();
+        jo.put("email", testService.email);
+        jo.put("code", "000000");
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jo.toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    // Can falsely fail with probability 3 / 1 000 000
+    @Test
+    public void authCode_Returns_403_When_TooManyAuthAttempts() throws Exception {
+        testService.createAccount();
+        JSONObject jo = new JSONObject();
+        jo.put("email", testService.email);
+        jo.put("code", "000000");
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jo.toString()));
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jo.toString()));
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jo.toString()));
+        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jo.toString()))
                 .andExpect(status().isForbidden());

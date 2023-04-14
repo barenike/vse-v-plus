@@ -6,7 +6,7 @@ import com.example.vse_back.model.entity.RoleEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.RoleRepository;
 import com.example.vse_back.model.repository.UserRepository;
-import com.example.vse_back.model.service.email_verification.AuthTokenService;
+import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,16 +17,16 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final AuthTokenService authTokenService;
+    private final AuthCodeService authCodeService;
     private final UserBalanceChangeRecordsService userBalanceChangeRecordsService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       AuthTokenService authTokenService,
+                       AuthCodeService authCodeService,
                        UserBalanceChangeRecordsService userBalanceChangeRecordsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.authTokenService = authTokenService;
+        this.authCodeService = authCodeService;
         this.userBalanceChangeRecordsService = userBalanceChangeRecordsService;
     }
 
@@ -67,10 +67,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private List<UserEntity> readAll() {
-        return userRepository.findAll();
-    }
-
     public UserEntity getUserById(String userId) {
         UserEntity user = userRepository.findByUserId(UUID.fromString(userId));
         if (user == null) {
@@ -84,15 +80,13 @@ public class UserService {
     }
 
     public List<UserEntity> getAllUsers() {
-        List<UserEntity> users = readAll();
-        users.removeIf(user -> user.getRoleEntity().getName().equals("ROLE_ADMIN") || !user.isEnabled());
-        return users;
+        return userRepository.findAll();
     }
 
     public boolean deleteUserById(UUID userId) {
         if (userRepository.existsById(userId)) {
-            boolean isVerificationTokenDeleted = authTokenService.deleteByUserId(userId);
-            if (!isVerificationTokenDeleted) {
+            boolean isAuthCodeDeleted = authCodeService.deleteByUserId(userId);
+            if (!isAuthCodeDeleted) {
                 return false;
             }
             userRepository.deleteById(userId);

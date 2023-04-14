@@ -1,13 +1,15 @@
 package com.example.vse_back.controller;
 
 import com.example.vse_back.configuration.jwt.JwtProvider;
-import com.example.vse_back.exceptions.AuthTokenHasExpiredException;
-import com.example.vse_back.exceptions.AuthTokenIsNotValidException;
+import com.example.vse_back.exceptions.AuthCodeHasExpiredException;
+import com.example.vse_back.exceptions.AuthCodeIsInvalidException;
+import com.example.vse_back.exceptions.AuthCodeIsNotFoundException;
+import com.example.vse_back.exceptions.UserIsNotFoundException;
 import com.example.vse_back.infrastructure.user.*;
-import com.example.vse_back.model.entity.AuthTokenEntity;
+import com.example.vse_back.model.entity.AuthCodeEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.UserService;
-import com.example.vse_back.model.service.email_verification.AuthTokenService;
+import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import com.example.vse_back.model.service.email_verification.OnRegistrationCompleteEvent;
 import com.example.vse_back.utils.Util;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,50 +26,57 @@ import java.util.UUID;
 @RestController
 public class UserController {
     private final UserService userService;
-    private final AuthTokenService authTokenService;
+    private final AuthCodeService authCodeService;
     private final JwtProvider jwtProvider;
     private final ApplicationEventPublisher eventPublisher;
 
     public UserController(UserService userService,
-                          AuthTokenService authTokenService,
+                          AuthCodeService authCodeService,
                           JwtProvider jwtProvider,
                           ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
-        this.authTokenService = authTokenService;
+        this.authCodeService = authCodeService;
         this.jwtProvider = jwtProvider;
         this.eventPublisher = eventPublisher;
     }
 
-    @Operation(summary = "Send a one-time auth token to the email address")
+    @Operation(summary = "Send a one-time auth code to the email address")
     @PostMapping("/auth/email")
-    public ResponseEntity<?> sendAuthTokenToEmailAddress(@RequestBody @Valid AuthEmailRequest authEmailRequest) {
+    public ResponseEntity<?> sendAuthCodeToEmailAddress(@RequestBody @Valid AuthEmailRequest authEmailRequest) {
         UserEntity user = userService.getUserByEmail(authEmailRequest.getEmail());
         if (user == null) {
             user = userService.createUser(authEmailRequest.getEmail());
         }
-        authTokenService.deleteByUserId(user.getId());
+        authCodeService.deleteByUserId(user.getId());
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "Get JWT")
-    @PostMapping("/auth/token")
-    public ResponseEntity<?> authToken(@RequestBody @Valid AuthTokenRequest authEmailRequest) {
-        String email = authEmailRequest.getEmail();
-        AuthTokenEntity authToken = authTokenService.getToken(authEmailRequest.getToken());
-        String token = authToken.getToken();
-        try {
-            if (!authToken.getUser().getEmail().equals(email)) {
-                throw new AuthTokenIsNotValidException(token);
-            } else if (ChronoUnit.MINUTES.between(authToken.getCreationDate(), Util.getCurrentMoscowDate()) > 60) {
-                throw new AuthTokenHasExpiredException(token);
-            } else {
-                UserEntity user = userService.getUserByEmail(email);
-                String jwt = jwtProvider.generateJwtToken(String.valueOf(user.getId()));
-                return new ResponseEntity<>(new AuthResponse(jwt), HttpStatus.OK);
-            }
-        } finally {
-            authTokenService.deleteByToken(token);
+    @PostMapping("/auth/code")
+    public ResponseEntity<?> authCode(@RequestBody @Valid AuthCodeRequest authCodeRequest) {
+        String email = authCodeRequest.getEmail();
+        String inputCode = authCodeRequest.getCode();
+        UserEntity user = userService.getUserByEmail(email);
+        if (user == null) {
+            throw new UserIsNotFoundException(email);
+        }
+        UUID userId = user.getId();
+        AuthCodeEntity authCode = authCodeService.getAuthCodeByUserId(userId);
+        if (authCode == null) {
+            throw new AuthCodeIsNotFoundException(email);
+        }
+        String originalCode = authCode.getCode();
+        if (!originalCode.equals(inputCode)) {
+            authCodeService.incrementAttemptCount(authCode);
+            throw new AuthCodeIsInvalidException(inputCode);
+        } else if (ChronoUnit.MINUTES.between(authCode.getCreationDate(), Util.getCurrentMoscowDate()) > 5) {
+            authCodeService.deleteByUserId(userId);
+            throw new AuthCodeHasExpiredException(inputCode);
+        } else {
+            authCodeService.deleteByUserId(userId);
+            String jwt = jwtProvider.generateJwt(String.valueOf(user.getId()));
+            return new ResponseEntity<>(new AuthResponse(jwt), HttpStatus.OK);
         }
     }
 

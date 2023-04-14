@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class AuthEmailRequest {
-    // @Pattern(regexp = "[\\w!#$%&'.*+/=?^`{|}~-]*@chelpipegroup\\.com")
+    // @Pattern(regexp = "[\\w!#$%&'.*+/=?^`{|}~-]*@chelpipegroup\\.com$")
     private String email;
 }

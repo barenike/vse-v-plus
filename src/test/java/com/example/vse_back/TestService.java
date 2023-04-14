@@ -8,7 +8,7 @@ import com.example.vse_back.model.service.DropboxService;
 import com.example.vse_back.model.service.OrderService;
 import com.example.vse_back.model.service.ProductService;
 import com.example.vse_back.model.service.UserService;
-import com.example.vse_back.model.service.email_verification.AuthTokenService;
+import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -44,7 +44,7 @@ public class TestService {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private AuthTokenService authTokenService;
+    private AuthCodeService authCodeService;
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -69,11 +69,11 @@ public class TestService {
     }
 
     String getUserJWT() {
-        return jwtProvider.generateJwtToken(String.valueOf(userService.getUserByEmail(email).getId()));
+        return jwtProvider.generateJwt(String.valueOf(userService.getUserByEmail(email).getId()));
     }
 
     String getAdminJWT() {
-        return jwtProvider.generateJwtToken(String.valueOf(userService.getUserByEmail(adminEmail).getId()));
+        return jwtProvider.generateJwt(String.valueOf(userService.getUserByEmail(adminEmail).getId()));
     }
 
     void createProduct() throws Exception {
@@ -123,7 +123,7 @@ public class TestService {
         return userService.getUserByEmail(email).getId();
     }
 
-    String getToken() {
-        return authTokenService.getTokenBuUserId(getUserId()).getToken();
+    String getCode() {
+        return authCodeService.getAuthCodeByUserId(getUserId()).getCode();
     }
 }
