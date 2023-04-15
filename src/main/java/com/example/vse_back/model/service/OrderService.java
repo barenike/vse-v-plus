@@ -1,6 +1,5 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
 import com.example.vse_back.infrastructure.order.OrderCreationDetails;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
@@ -12,41 +11,38 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static com.example.vse_back.utils.Util.getCurrentMoscowDate;
+import static com.example.vse_back.model.service.utils.LocalUtil.getCurrentMoscowDate;
 
 @Service
 public class OrderService {
     private final UserService userService;
     private final ProductService productService;
-    private final OrderRecordService orderRecordService;
+    private final OrderDetailService orderDetailService;
     private final OrderRepository orderRepository;
-    private final JwtProvider jwtProvider;
 
     public OrderService(UserService userService,
                         ProductService productService,
-                        OrderRecordService orderRecordService,
-                        OrderRepository orderRepository,
-                        JwtProvider jwtProvider) {
+                        OrderDetailService orderDetailService,
+                        OrderRepository orderRepository) {
         this.userService = userService;
         this.productService = productService;
-        this.orderRecordService = orderRecordService;
+        this.orderDetailService = orderDetailService;
         this.orderRepository = orderRepository;
-        this.jwtProvider = jwtProvider;
     }
 
+    // Refactor
     @Transactional
-    public void createOrder(OrderCreationRequest orderCreationRequest, String token) {
+    public void createOrder(OrderCreationRequest orderCreationRequest, UserEntity user) {
+        List<OrderCreationDetails> orderCreationDetails = orderCreationRequest.getOrderCreationDetails();
         OrderEntity order = new OrderEntity();
         order.setStatus(OrderStatusEnum.CREATED.toString());
-        String userId = jwtProvider.getUserIdFromRawToken(token);
-        UserEntity user = userService.getUserById(userId);
-        order.setUserId(UUID.fromString(userId));
+        order.setUser(user);
         order.setCreationDate(getCurrentMoscowDate());
         int total = 0;
-        for (OrderCreationDetails orderCreationDetails : orderCreationRequest.getOrderCreationDetails()) {
-            String productId = orderCreationDetails.getProductId();
+        for (OrderCreationDetails orderCreationDetail : orderCreationDetails) {
+            String productId = orderCreationDetail.getProductId();
             ProductEntity product = productService.getProductById(UUID.fromString(productId));
-            total += product.getPrice() * orderCreationDetails.getQuantity();
+            total += product.getPrice() * orderCreationDetail.getQuantity();
         }
         Integer userBalance = user.getUserBalance();
         if (total > userBalance) {
@@ -54,11 +50,12 @@ public class OrderService {
         }
         order.setTotal(total);
         orderRepository.save(order);
-        orderRecordService.createOrderRecord(orderCreationRequest.getOrderCreationDetails(), order.getId());
-        productService.changeProductAmount(orderCreationRequest.getOrderCreationDetails());
+        orderDetailService.createOrderDetail(orderCreationDetails, order);
+        productService.setProductAmount(orderCreationDetails);
         userService.changeUserBalance(user, userBalance - total, "Оформление заказа");
     }
 
+    // Refactor
     public boolean changeOrderStatus(UUID id, String status) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getById(id);
@@ -83,6 +80,7 @@ public class OrderService {
         return orderRepository.findByUserId(userId);
     }
 
+    // Refactor
     @Transactional
     public boolean deleteOrderById(UUID id) {
         if (orderRepository.existsById(id)) {
@@ -90,19 +88,18 @@ public class OrderService {
             if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
                 return false;
             }
-            String userId = String.valueOf(order.getUserId());
-            UserEntity user = userService.getUserById(userId);
+            UserEntity user = order.getUser();
             Integer userBalance = user.getUserBalance();
             Integer total = order.getTotal();
-            List<OrderRecordEntity> orderRecords = orderRecordService.getOrderRecordsByOrderId(id);
-            for (OrderRecordEntity orderRecord : orderRecords) {
-                ProductEntity product = productService.getProductById(orderRecord.getProductId());
-                Integer quantity = orderRecord.getQuantity();
-                boolean isDeleted = orderRecordService.deleteOrderRecordById(orderRecord.getId());
+            List<OrderDetailEntity> orderDetails = orderDetailService.getOrderDetailsByOrderId(id);
+            for (OrderDetailEntity orderDetail : orderDetails) {
+                ProductEntity product = orderDetail.getProduct();
+                Integer quantity = orderDetail.getQuantity();
+                boolean isDeleted = orderDetailService.deleteOrderDetailById(orderDetail.getId());
                 if (!isDeleted) {
                     return false;
                 }
-                productService.changeProductAmount(product, product.getAmount() + quantity);
+                productService.setProductAmount(product, product.getAmount() + quantity);
             }
             orderRepository.deleteById(id);
             userService.changeUserBalance(user, userBalance + total, "Отмена заказа");

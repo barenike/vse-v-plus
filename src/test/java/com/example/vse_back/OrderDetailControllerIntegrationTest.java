@@ -1,7 +1,7 @@
 package com.example.vse_back;
 
-import com.example.vse_back.model.entity.OrderRecordEntity;
-import com.example.vse_back.model.service.OrderRecordService;
+import com.example.vse_back.model.entity.OrderDetailEntity;
+import com.example.vse_back.model.service.OrderDetailService;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = VseBackApplication.class)
 @AutoConfigureMockMvc
 @Transactional
-public class OrderRecordControllerIntegrationTest {
+public class OrderDetailControllerIntegrationTest {
     @Autowired
     private MockMvc mvc;
 
@@ -30,7 +30,7 @@ public class OrderRecordControllerIntegrationTest {
     private TestService testService;
 
     @Autowired
-    private OrderRecordService orderRecordService;
+    private OrderDetailService orderDetailService;
 
     @AfterEach
     void cleanup() {
@@ -38,54 +38,54 @@ public class OrderRecordControllerIntegrationTest {
     }
 
     @Test
-    public void getMyOrderRecordsByOrderId_Returns_200() throws Exception {
+    public void getMyOrderDetailsByOrderId_Returns_200() throws Exception {
         testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
-        mvc.perform(MockMvcRequestBuilders.get("/user/order_records/{orderId}", testService.getOrderId())
+        mvc.perform(MockMvcRequestBuilders.get("/user/order_details/{orderId}", testService.getOrderId())
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
         testService.deleteProduct();
     }
 
     @Test
-    public void getMyOrderRecordsByOrderId_Returns_404() throws Exception {
+    public void getMyOrderDetailsByOrderId_Returns_404() throws Exception {
         testService.createAccount();
-        mvc.perform(MockMvcRequestBuilders.get("/user/order_records/{orderId}", "fb96924c-f4a2-4576-8b8b-42b903d9a822")
+        mvc.perform(MockMvcRequestBuilders.get("/user/order_details/{orderId}", "fb96924c-f4a2-4576-8b8b-42b903d9a822")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void getOrderRecords_Returns_200() throws Exception {
+    public void getOrderDetails_Returns_200() throws Exception {
         testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
-        mvc.perform(MockMvcRequestBuilders.get("/admin/order_records")
+        mvc.perform(MockMvcRequestBuilders.get("/admin/order_details")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
         testService.deleteProduct();
     }
 
     @Test
-    public void getOrderRecordById_Returns_200() throws Exception {
+    public void getOrderDetailById_Returns_200() throws Exception {
         testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
-        List<OrderRecordEntity> orderRecords = orderRecordService.getOrderRecordsByOrderId(UUID.fromString(testService.getOrderId()));
-        mvc.perform(MockMvcRequestBuilders.get("/admin/order_records/{orderRecordId}", orderRecords.get(0).getId())
+        List<OrderDetailEntity> orderDetails = orderDetailService.getOrderDetailsByOrderId(UUID.fromString(testService.getOrderId()));
+        mvc.perform(MockMvcRequestBuilders.get("/admin/order_details/{orderDetailId}", orderDetails.get(0).getId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
         testService.deleteProduct();
     }
 
     @Test
-    public void getOrderRecordById_Returns_403_When_OrderRecordIsNotFound() throws Exception {
+    public void getOrderDetailById_Returns_403_When_OrderDetailIsNotFound() throws Exception {
         testService.createAccount();
-        mvc.perform(MockMvcRequestBuilders.get("/admin/order_records/{orderRecordId}", "d6a3e216-fb57-4f0e-81c9-400b25d1b32c")
+        mvc.perform(MockMvcRequestBuilders.get("/admin/order_details/{orderDetailId}", "d6a3e216-fb57-4f0e-81c9-400b25d1b32c")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isForbidden());
     }

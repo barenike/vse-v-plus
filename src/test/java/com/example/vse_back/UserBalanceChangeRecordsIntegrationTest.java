@@ -31,7 +31,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
     private TestService testService;
 
     @Test
-    public void balanceChangeRecords_Returns_200() throws Exception {
+    public void getMyBalanceChangeRecords_Returns_200() throws Exception {
         testService.createAccount();
         UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
         JSONObject jo = new JSONObject();
@@ -44,6 +44,24 @@ public class UserBalanceChangeRecordsIntegrationTest {
                 .content(jo.toString()));
 
         mvc.perform(MockMvcRequestBuilders.get("/user/balance_change_records")
+                        .header("Authorization", "Bearer " + testService.getUserJWT()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getBalanceChangeRecords_Returns_200() throws Exception {
+        testService.createAccount();
+        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
+        JSONObject jo = new JSONObject();
+        jo.put("userId", user.getId().toString());
+        jo.put("userBalance", 200);
+        jo.put("cause", "Тест");
+        mvc.perform(MockMvcRequestBuilders.post("/admin/user_balance")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + testService.getAdminJWT())
+                .content(jo.toString()));
+
+        mvc.perform(MockMvcRequestBuilders.get("/admin/balance_change_records/" + user.getId())
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
     }

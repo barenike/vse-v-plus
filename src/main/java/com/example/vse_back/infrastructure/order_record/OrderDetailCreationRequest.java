@@ -6,7 +6,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class OrderRecordCreationRequest {
+public class OrderDetailCreationRequest {
     @NotNull
     private String orderId;
 

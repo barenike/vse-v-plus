@@ -28,12 +28,12 @@ public class AuthCodeEntity {
     @Column(name = "code", nullable = false, length = 6)
     private String code;
 
-    @OneToOne(targetEntity = UserEntity.class, fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;
+    @Column(name = "date", nullable = false)
+    private LocalDateTime date;
 
     @Column(name = "attempt_count", nullable = false)
     private Integer attemptCount;

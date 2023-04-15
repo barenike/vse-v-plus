@@ -15,7 +15,7 @@ public class CustomUserDetails implements UserDetails {
     public static CustomUserDetails fromUserEntityToCustomUserDetails(UserEntity user) {
         CustomUserDetails c = new CustomUserDetails();
         c.email = user.getEmail();
-        c.grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRoleEntity().getName()));
+        c.grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName()));
         return c;
     }
 

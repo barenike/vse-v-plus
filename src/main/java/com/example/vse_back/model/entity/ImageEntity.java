@@ -8,7 +8,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,31 +16,25 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "user_balance_change_records")
-public class UserBalanceChangeRecordsEntity {
+@Table(name = "images")
+public class ImageEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
 
-    @Column(name = "change_amount", nullable = false)
-    private Integer changeAmount;
-
-    @Column(name = "cause", nullable = false)
-    private String cause;
-
-    @Column(name = "date")
-    private LocalDateTime date;
+    @Column(name = "image_path", nullable = false)
+    private String imagePath;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        UserBalanceChangeRecordsEntity that = (UserBalanceChangeRecordsEntity) o;
+        ImageEntity that = (ImageEntity) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

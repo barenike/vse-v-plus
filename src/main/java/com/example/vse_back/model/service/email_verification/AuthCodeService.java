@@ -4,7 +4,7 @@ import com.example.vse_back.exceptions.TooManyAuthAttemptsException;
 import com.example.vse_back.model.entity.AuthCodeEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.AuthCodeRepository;
-import com.example.vse_back.utils.Util;
+import com.example.vse_back.model.service.utils.LocalUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class AuthCodeService {
         AuthCodeEntity authCode = new AuthCodeEntity();
         authCode.setUser(user);
         authCode.setCode(code);
-        authCode.setCreationDate(Util.getCurrentMoscowDate());
+        authCode.setDate(LocalUtil.getCurrentMoscowDate());
         authCode.setAttemptCount(0);
         authCodeRepository.save(authCode);
     }

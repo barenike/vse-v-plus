@@ -9,7 +9,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -27,7 +29,19 @@ public class UserEntity {
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
-    private RoleEntity roleEntity;
+    private RoleEntity role;
+
+    @OneToOne
+    @JoinColumn(name = "image_id", nullable = false)
+    private ImageEntity image;
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private Set<OrderEntity> orderSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet = new HashSet<>();
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -39,21 +53,20 @@ public class UserEntity {
     @Column(name = "is_enabled", nullable = false)
     private boolean isEnabled;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
     @Column(name = "job_title")
     private String jobTitle;
 
-    @Column(name = "info_about")
+    @Column(name = "info_about", length = 1023)
     private String infoAbout;
-
 
     @Override
     public boolean equals(Object o) {

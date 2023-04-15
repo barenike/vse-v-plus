@@ -9,7 +9,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -25,8 +27,13 @@ public class OrderEntity {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+    @OneToMany(mappedBy = "order")
+    @ToString.Exclude
+    private Set<OrderDetailEntity> orderDetailSet = new HashSet<>();
 
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;

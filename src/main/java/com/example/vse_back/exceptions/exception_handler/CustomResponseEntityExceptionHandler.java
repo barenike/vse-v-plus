@@ -21,9 +21,10 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             AuthCodeHasExpiredException.class,
             AuthCodeIsInvalidException.class,
             AuthCodeIsNotFoundException.class,
+            InputFileIsNotImageException.class,
             NotEnabledUserException.class,
             NotEnoughCoinsException.class,
-            OrderRecordIsNotFoundException.class,
+            OrderDetailIsNotFoundException.class,
             ProductIsNotFoundException.class,
             TooManyAuthAttemptsException.class,
             UserIsNotFoundException.class

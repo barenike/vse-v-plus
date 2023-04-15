@@ -17,38 +17,31 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "products")
-public class ProductEntity {
+@Table(name = "order_details")
+public class OrderDetailEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    // I'd need a Set of them later
-    @OneToOne
-    @JoinColumn(name = "image_id", nullable = false)
-    private ImageEntity image;
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    private OrderEntity order;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Min(1)
-    @Column(name = "price", nullable = false)
-    private Integer price;
-
-    @Column(name = "description", length = 1023)
-    private String description;
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductEntity product;
 
     @Min(1)
-    @Column(name = "amount", nullable = false)
-    private Integer amount;
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        ProductEntity that = (ProductEntity) o;
+        OrderDetailEntity that = (OrderDetailEntity) o;
         return id != null && Objects.equals(id, that.id);
     }
 

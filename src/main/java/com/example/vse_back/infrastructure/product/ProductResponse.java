@@ -1,5 +1,6 @@
 package com.example.vse_back.infrastructure.product;
 
+import com.example.vse_back.model.entity.ImageEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,5 +13,5 @@ public class ProductResponse {
 
     private Integer price;
 
-    private String imageUrl;
+    private ImageEntity image;
 }

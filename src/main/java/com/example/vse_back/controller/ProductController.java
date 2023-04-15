@@ -30,18 +30,18 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Change amount of the product")
+    @Operation(summary = "Set an amount of the product")
     @PostMapping("/admin/product_amount")
-    public ResponseEntity<?> changeProductAmount(@RequestBody @Valid ProductAmountRequest productAmountRequest) {
+    public ResponseEntity<?> setProductAmount(@RequestBody @Valid ProductAmountRequest productAmountRequest) {
         String productId = productAmountRequest.getProductId();
         ProductEntity product = productService.getProductById(UUID.fromString(productId));
-        productService.changeProductAmount(product, productAmountRequest.getAmount());
+        productService.setProductAmount(product, productAmountRequest.getAmount());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "Get all products")
     @GetMapping("/products")
-    public ResponseEntity<List<ProductResponse>> getProducts() {
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
         final List<ProductResponse> products = productService.getAllProducts();
         return products != null && !products.isEmpty()
                 ? new ResponseEntity<>(products, HttpStatus.OK)

@@ -8,7 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,30 +17,33 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "order_records")
-public class OrderRecordEntity {
+@Table(name = "balance_change_records")
+public class BalanceChangeRecordsEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @Column(name = "order_id", nullable = false)
-    private UUID orderId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
-    @Column(name = "product_id", nullable = false)
-    private UUID productId;
+    @Column(name = "change_amount", nullable = false)
+    private Integer changeAmount;
 
-    @Min(1)
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @Column(name = "cause", nullable = false)
+    private String cause;
+
+    @Column(name = "date")
+    private LocalDateTime date;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        OrderRecordEntity that = (OrderRecordEntity) o;
-        return id != null && Objects.equals(id, that.id);
+        BalanceChangeRecordsEntity that = (BalanceChangeRecordsEntity) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override

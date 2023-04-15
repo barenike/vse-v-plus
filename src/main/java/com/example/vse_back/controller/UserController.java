@@ -11,7 +11,7 @@ import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.UserService;
 import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import com.example.vse_back.model.service.email_verification.OnRegistrationCompleteEvent;
-import com.example.vse_back.utils.Util;
+import com.example.vse_back.model.service.utils.LocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -27,15 +27,16 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final AuthCodeService authCodeService;
+    private final LocalUtil localUtil;
     private final JwtProvider jwtProvider;
     private final ApplicationEventPublisher eventPublisher;
 
     public UserController(UserService userService,
                           AuthCodeService authCodeService,
-                          JwtProvider jwtProvider,
-                          ApplicationEventPublisher eventPublisher) {
+                          LocalUtil localUtil, JwtProvider jwtProvider, ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
         this.authCodeService = authCodeService;
+        this.localUtil = localUtil;
         this.jwtProvider = jwtProvider;
         this.eventPublisher = eventPublisher;
     }
@@ -70,7 +71,7 @@ public class UserController {
         if (!originalCode.equals(inputCode)) {
             authCodeService.incrementAttemptCount(authCode);
             throw new AuthCodeIsInvalidException(inputCode);
-        } else if (ChronoUnit.MINUTES.between(authCode.getCreationDate(), Util.getCurrentMoscowDate()) > 5) {
+        } else if (ChronoUnit.MINUTES.between(authCode.getDate(), LocalUtil.getCurrentMoscowDate()) > 5) {
             authCodeService.deleteByUserId(userId);
             throw new AuthCodeHasExpiredException(inputCode);
         } else {
@@ -82,12 +83,11 @@ public class UserController {
 
     @Operation(summary = "Get my profile info")
     @GetMapping("/info")
-    public ResponseEntity<?> getInfo(@RequestHeader(name = "Authorization") String token) {
-        String userId = jwtProvider.getUserIdFromRawToken(token);
-        UserEntity user = userService.getUserById(userId);
+    public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
+        UserEntity user = localUtil.getUserFromToken(token);
         return new ResponseEntity<>(new InfoResponse(
                 user.getId().toString(),
-                user.getRoleEntity().getRoleId(),
+                user.getRole().getRoleId(),
                 user.getEmail(),
                 user.getUserBalance(),
                 user.getPhoneNumber(),
@@ -100,10 +100,9 @@ public class UserController {
 
     @Operation(summary = "Change my profile info")
     @PostMapping("/info/change")
-    public ResponseEntity<?> changeInfo(@RequestHeader(name = "Authorization") String token,
-                                        @RequestBody @Valid UserInfoChangeRequest userInfoChangeRequest) {
-        String userId = jwtProvider.getUserIdFromRawToken(token);
-        UserEntity user = userService.getUserById(userId);
+    public ResponseEntity<?> changeMyInfo(@RequestHeader(name = "Authorization") String token,
+                                          @RequestBody @Valid UserInfoChangeRequest userInfoChangeRequest) {
+        UserEntity user = localUtil.getUserFromToken(token);
         userService.changeUserInfo(user, userInfoChangeRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -132,7 +131,7 @@ public class UserController {
         List<UserEntity> users = userService.getAllUsers();
         List<InfoResponse> result = users.stream().map(user -> new InfoResponse(
                 user.getId().toString(),
-                user.getRoleEntity().getRoleId(),
+                user.getRole().getRoleId(),
                 user.getEmail(),
                 user.getUserBalance(),
                 user.getPhoneNumber(),

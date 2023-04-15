@@ -4,7 +4,6 @@ import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.infrastructure.product.ProductResponse;
 import com.example.vse_back.model.entity.OrderEntity;
 import com.example.vse_back.model.entity.UserEntity;
-import com.example.vse_back.model.service.DropboxService;
 import com.example.vse_back.model.service.OrderService;
 import com.example.vse_back.model.service.ProductService;
 import com.example.vse_back.model.service.UserService;
@@ -39,8 +38,6 @@ public class TestService {
     private UserService userService;
     @Autowired
     private ProductService productService;
-    @Autowired
-    private DropboxService dropboxService;
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -104,7 +101,7 @@ public class TestService {
     }
 
     void deleteProduct() {
-        dropboxService.deleteFile("/test_image.jpg");
+        productService.deleteProductById(UUID.fromString(getProductId()));
     }
 
     void createOrder() throws Exception {

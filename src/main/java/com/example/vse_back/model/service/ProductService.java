@@ -4,12 +4,11 @@ import com.example.vse_back.exceptions.ProductIsNotFoundException;
 import com.example.vse_back.infrastructure.order.OrderCreationDetails;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
 import com.example.vse_back.infrastructure.product.ProductResponse;
+import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.entity.ProductEntity;
 import com.example.vse_back.model.repository.ProductRepository;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,11 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
-    private final DropboxService dropboxService;
+    private final ImageService imageService;
 
-    public ProductService(ProductRepository productRepository, DropboxService dropboxService) {
+    public ProductService(ProductRepository productRepository, ImageService imageService) {
         this.productRepository = productRepository;
-        this.dropboxService = dropboxService;
+        this.imageService = imageService;
     }
 
     public List<ProductResponse> getAllProducts() {
@@ -30,7 +29,7 @@ public class ProductService {
                 product.getId().toString(),
                 product.getName(),
                 product.getPrice(),
-                product.getImageUrl()
+                product.getImage()
         )).collect(Collectors.toList());
     }
 
@@ -43,44 +42,32 @@ public class ProductService {
     }
 
     public void createProduct(ProductCreationRequest productCreationRequest) {
+        String productName = productCreationRequest.getName();
         ProductEntity product = new ProductEntity();
-        product.setName(productCreationRequest.getName());
+        product.setName(productName);
         product.setPrice(productCreationRequest.getPrice());
         product.setDescription(productCreationRequest.getDescription());
         product.setAmount(productCreationRequest.getAmount());
-        String extension = FilenameUtils.getExtension(productCreationRequest.getFile().getOriginalFilename());
-        String imagePath = String.format("/%s.%s", product.getName(), extension);
-        product.setImagePath(imagePath);
-        String imageUrl;
-        try {
-            imageUrl = dropboxService.uploadFile(imagePath, productCreationRequest.getFile().getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        product.setImageUrl(imageUrl);
+        ImageEntity image = imageService.createImage(productCreationRequest.getFile(), productName);
+        product.setImage(image);
         productRepository.save(product);
     }
 
-    // Maybe, I will refactor this later
-    public void changeProductAmount(String productId, Integer amount) {
-        ProductEntity product = getProductById(UUID.fromString(productId));
+    public void setProductAmount(ProductEntity product, Integer amount) {
         product.setAmount(amount);
         productRepository.save(product);
     }
 
-    public void changeProductAmount(ProductEntity product, Integer amount) {
-        product.setAmount(amount);
-        productRepository.save(product);
-    }
-
-    public void changeProductAmount(List<OrderCreationDetails> orderCreationDetails) {
-        orderCreationDetails.forEach(details -> changeProductAmount(details.getProductId(),
-                getProductById(UUID.fromString(details.getProductId())).getAmount() - details.getQuantity()));
+    public void setProductAmount(List<OrderCreationDetails> orderCreationDetails) {
+        orderCreationDetails.forEach(detail -> {
+            ProductEntity product = getProductById(UUID.fromString(detail.getProductId()));
+            setProductAmount(product, product.getAmount() - detail.getQuantity());
+        });
     }
 
     public boolean deleteProductById(UUID id) {
         if (productRepository.existsById(id)) {
-            dropboxService.deleteFile(getProductById(id).getImagePath());
+            imageService.deleteImage(getProductById(id).getImage().getId());
             productRepository.deleteById(id);
             return true;
         }

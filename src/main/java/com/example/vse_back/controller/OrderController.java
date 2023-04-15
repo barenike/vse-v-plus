@@ -1,11 +1,10 @@
 package com.example.vse_back.controller;
 
-import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
 import com.example.vse_back.model.entity.OrderEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.OrderService;
-import com.example.vse_back.model.service.UserService;
+import com.example.vse_back.model.service.utils.LocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,28 +17,26 @@ import java.util.UUID;
 @RestController
 public class OrderController {
     private final OrderService orderService;
-    private final UserService userService;
-    private final JwtProvider jwtProvider;
+    private final LocalUtil localUtil;
 
-    public OrderController(OrderService orderService, UserService userService, JwtProvider jwtProvider) {
+    public OrderController(OrderService orderService, LocalUtil localUtil) {
         this.orderService = orderService;
-        this.userService = userService;
-        this.jwtProvider = jwtProvider;
+        this.localUtil = localUtil;
     }
 
     @Operation(summary = "Create the new order")
     @PostMapping("/user/orders")
     public ResponseEntity<?> createOrder(@RequestBody @Valid OrderCreationRequest orderCreationRequest,
                                          @RequestHeader(name = "Authorization") String token) {
-        orderService.createOrder(orderCreationRequest, token);
+        UserEntity user = localUtil.getUserFromToken(token);
+        orderService.createOrder(orderCreationRequest, user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get user's orders (id is extracted from JWT)")
     @GetMapping("/user/orders")
     public ResponseEntity<?> getMyOrders(@RequestHeader(name = "Authorization") String token) {
-        String userId = jwtProvider.getUserIdFromRawToken(token);
-        UserEntity user = userService.getUserById(userId);
+        UserEntity user = localUtil.getUserFromToken(token);
         final List<OrderEntity> orders = orderService.getOrdersByUserId(user.getId());
         return orders != null && !orders.isEmpty()
                 ? new ResponseEntity<>(orders, HttpStatus.OK)

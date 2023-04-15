@@ -100,7 +100,7 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
-    public void info_Returns_200() throws Exception {
+    public void getMyInfo_Returns_200() throws Exception {
         testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
@@ -108,7 +108,7 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
-    public void infoChange_Returns_200() throws Exception {
+    public void changeMyInfo_Returns_200() throws Exception {
         testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("phoneNumber", testService.phoneNumber);

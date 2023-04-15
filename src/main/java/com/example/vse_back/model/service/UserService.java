@@ -18,22 +18,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AuthCodeService authCodeService;
-    private final UserBalanceChangeRecordsService userBalanceChangeRecordsService;
+    private final BalanceChangeRecordsService balanceChangeRecordsService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        AuthCodeService authCodeService,
-                       UserBalanceChangeRecordsService userBalanceChangeRecordsService) {
+                       BalanceChangeRecordsService balanceChangeRecordsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authCodeService = authCodeService;
-        this.userBalanceChangeRecordsService = userBalanceChangeRecordsService;
+        this.balanceChangeRecordsService = balanceChangeRecordsService;
     }
 
     public UserEntity createUser(String email) {
         UserEntity user = new UserEntity();
         RoleEntity userRole = roleRepository.findByName("ROLE_USER");
-        user.setRoleEntity(userRole);
+        user.setRole(userRole);
         user.setEnabled(true);
         user.setEmail(email);
         user.setUserBalance(0);
@@ -53,7 +53,7 @@ public class UserService {
 
     @Transactional
     public void changeUserBalance(UserEntity user, Integer balance, String cause) {
-        userBalanceChangeRecordsService.createRecord(user, balance, cause);
+        balanceChangeRecordsService.createRecord(user, balance, cause);
         user.setUserBalance(balance);
         userRepository.save(user);
     }
