@@ -1,8 +1,7 @@
 package com.example.vse_back.infrastructure.product;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 public class ProductRequest {

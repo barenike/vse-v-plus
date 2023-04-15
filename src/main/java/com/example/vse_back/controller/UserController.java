@@ -13,12 +13,12 @@ import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import com.example.vse_back.model.service.email_verification.OnRegistrationCompleteEvent;
 import com.example.vse_back.model.service.utils.LocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -81,6 +81,7 @@ public class UserController {
         }
     }
 
+    // What's about image?
     @Operation(summary = "Get my profile info")
     @GetMapping("/info")
     public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
@@ -98,6 +99,7 @@ public class UserController {
                 HttpStatus.OK);
     }
 
+    // What's about image?
     @Operation(summary = "Change my profile info")
     @PostMapping("/info/change")
     public ResponseEntity<?> changeMyInfo(@RequestHeader(name = "Authorization") String token,
@@ -125,6 +127,8 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // I think two separate methods are needed for user and admin
+    // What's about image?
     @Operation(summary = "Get profile info of all users")
     @GetMapping("/info/all_users")
     public ResponseEntity<?> getAllUsersInfo() {
@@ -140,9 +144,9 @@ public class UserController {
                 user.getJobTitle(),
                 user.getInfoAbout()
         )).toList();
-        AdminInfoResponse adminInfoResponse = new AdminInfoResponse(result);
-        return adminInfoResponse.getInfoList() != null && !adminInfoResponse.getInfoList().isEmpty()
-                ? new ResponseEntity<>(adminInfoResponse, HttpStatus.OK)
+        InfoAllUsersResponse infoAllUsersResponse = new InfoAllUsersResponse(result);
+        return infoAllUsersResponse.getInfoList() != null && !infoAllUsersResponse.getInfoList().isEmpty()
+                ? new ResponseEntity<>(infoAllUsersResponse, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);
     }
 }

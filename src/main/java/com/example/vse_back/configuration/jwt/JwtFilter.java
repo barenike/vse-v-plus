@@ -2,18 +2,19 @@ package com.example.vse_back.configuration.jwt;
 
 import com.example.vse_back.configuration.CustomUserDetails;
 import com.example.vse_back.configuration.CustomUserDetailsService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -21,7 +22,8 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 @Log
 public class JwtFilter extends GenericFilterBean {
-    public static final String AUTHORIZATION = "Authorization";
+    @Value("${jwt.header}")
+    private String jwtHeader;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -43,7 +45,7 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
-        String bearer = request.getHeader(AUTHORIZATION);
+        String bearer = request.getHeader(jwtHeader);
         if (hasText(bearer) && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
         }

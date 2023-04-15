@@ -1,5 +1,7 @@
 package com.example.vse_back.model.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -7,8 +9,6 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import javax.validation.constraints.Min;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +24,7 @@ public class UserEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue(generator = "uuid")
+    // Well, how can I change that?
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 

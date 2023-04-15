@@ -175,7 +175,7 @@ public class UserControllerIntegrationTest {
     public void getAllUsersInfo_Returns_200() throws Exception {
         testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info/all_users")
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
+                        .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
     }
 }

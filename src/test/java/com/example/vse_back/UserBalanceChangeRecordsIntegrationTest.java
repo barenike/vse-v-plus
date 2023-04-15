@@ -62,7 +62,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
                 .content(jo.toString()));
 
         mvc.perform(MockMvcRequestBuilders.get("/admin/balance_change_records/" + user.getId())
-                        .header("Authorization", "Bearer " + testService.getUserJWT()))
+                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }
 }
