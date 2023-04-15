@@ -26,6 +26,7 @@ public class ImageService {
         checkWhetherFileIsImage(file);
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        // imagePath needs to be random (fix it)
         String imagePath = String.format("/%s.%s", productName, extension);
         String imageUrl;
 
