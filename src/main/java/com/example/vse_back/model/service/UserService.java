@@ -9,6 +9,7 @@ import com.example.vse_back.model.repository.UserRepository;
 import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,15 +19,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AuthCodeService authCodeService;
+    private final ImageService imageService;
     private final BalanceChangeRecordsService balanceChangeRecordsService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        AuthCodeService authCodeService,
-                       BalanceChangeRecordsService balanceChangeRecordsService) {
+                       ImageService imageService, BalanceChangeRecordsService balanceChangeRecordsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authCodeService = authCodeService;
+        this.imageService = imageService;
         this.balanceChangeRecordsService = balanceChangeRecordsService;
     }
 
@@ -64,7 +67,19 @@ public class UserService {
         user.setLastName(userInfoChangeRequest.getLastName());
         user.setJobTitle(userInfoChangeRequest.getJobTitle());
         user.setInfoAbout(userInfoChangeRequest.getInfoAbout());
+        setImage(user, userInfoChangeRequest.getFile());
         userRepository.save(user);
+    }
+
+    private void setImage(UserEntity user, MultipartFile file) {
+        if (file == null && user.getImage() != null) {
+            imageService.deleteImage(user.getImage().getId());
+        } else if (file != null) {
+            if (user.getImage() != null) {
+                imageService.deleteImage(user.getImage().getId());
+            }
+            imageService.createImage(file);
+        }
     }
 
     public UserEntity getUserById(String userId) {

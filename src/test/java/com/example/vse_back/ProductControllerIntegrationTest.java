@@ -31,7 +31,7 @@ public class ProductControllerIntegrationTest {
     @Autowired
     private TestService testService;
 
-    // If one test would fail, then deleteProduct_Returns_200 also would fail, because of this method.
+    // If one test would fail, then deleteProduct_Returns_200 also would fail, because of this method
     @AfterEach
     void cleanup() {
         testService.deleteProduct();

@@ -30,7 +30,6 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    // Refactor
     @Transactional
     public void createOrder(OrderCreationRequest orderCreationRequest, UserEntity user) {
         List<OrderCreationDetails> orderCreationDetails = orderCreationRequest.getOrderCreationDetails();
@@ -38,12 +37,7 @@ public class OrderService {
         order.setStatus(OrderStatusEnum.CREATED.toString());
         order.setUser(user);
         order.setCreationDate(getCurrentMoscowDate());
-        int total = 0;
-        for (OrderCreationDetails orderCreationDetail : orderCreationDetails) {
-            String productId = orderCreationDetail.getProductId();
-            ProductEntity product = productService.getProductById(UUID.fromString(productId));
-            total += product.getPrice() * orderCreationDetail.getQuantity();
-        }
+        Integer total = getTotal(orderCreationDetails);
         Integer userBalance = user.getUserBalance();
         if (total > userBalance) {
             throw new NotEnoughCoinsException(userBalance);
@@ -55,12 +49,24 @@ public class OrderService {
         userService.changeUserBalance(user, userBalance - total, "Оформление заказа");
     }
 
+    private Integer getTotal(List<OrderCreationDetails> orderCreationDetails) {
+        int total = 0;
+        for (OrderCreationDetails orderCreationDetail : orderCreationDetails) {
+            String productId = orderCreationDetail.getProductId();
+            ProductEntity product = productService.getProductById(UUID.fromString(productId));
+            total += product.getPrice() * orderCreationDetail.getQuantity();
+        }
+        return total;
+    }
+
     // Refactor
-    public boolean changeOrderStatus(UUID id, String status) {
-        if (orderRepository.existsById(id)) {
-            OrderEntity order = orderRepository.getById(id);
+    public boolean changeOrderStatus(UUID orderId, String status) {
+        if (orderRepository.existsById(orderId)) {
+            OrderEntity order = orderRepository.getReferenceById(orderId);
             order.setStatus(OrderStatusEnum.valueOf(status).toString());
-            if (OrderStatusEnum.SHIPPED.toString().equals(status)) {
+            if (OrderStatusEnum.CREATED.toString().equals(status)) {
+                throw new RuntimeException(); // Create new custom exception
+            } else if (OrderStatusEnum.SHIPPED.toString().equals(status)) {
                 order.setShippingDate(getCurrentMoscowDate());
             } else if (OrderStatusEnum.COMPLETED.toString().equals(status)) {
                 order.setCompletionDate(getCurrentMoscowDate());
@@ -84,7 +90,7 @@ public class OrderService {
     @Transactional
     public boolean deleteOrderById(UUID id) {
         if (orderRepository.existsById(id)) {
-            OrderEntity order = orderRepository.getById(id);
+            OrderEntity order = orderRepository.getReferenceById(id);
             if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
                 return false;
             }

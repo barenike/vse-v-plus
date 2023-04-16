@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -21,9 +21,13 @@ import java.util.UUID;
 public class OrderDetailEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue
+    @UuidGenerator
     private UUID id;
+
+    @Min(1)
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
@@ -32,10 +36,6 @@ public class OrderDetailEntity {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
-
-    @Min(1)
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
 
     @Override
     public boolean equals(Object o) {

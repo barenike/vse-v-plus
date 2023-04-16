@@ -22,7 +22,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // Failure tests is possibly needed.
+    // Failure tests are possibly needed
     @Operation(summary = "Create the product")
     @PostMapping("/admin/product")
     public ResponseEntity<?> createProduct(@ModelAttribute @Valid ProductCreationRequest productCreationRequest) {

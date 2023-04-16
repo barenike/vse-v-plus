@@ -22,12 +22,12 @@ public class ImageService {
         this.dropboxService = dropboxService;
     }
 
-    public ImageEntity createImage(MultipartFile file, String productName) {
+    public ImageEntity createImage(MultipartFile file) {
         checkWhetherFileIsImage(file);
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        // imagePath needs to be random (fix it)
-        String imagePath = String.format("/%s.%s", productName, extension);
+        String name = UUID.randomUUID().toString();
+        String imagePath = String.format("/%s.%s", name, extension);
         String imageUrl;
 
         try (InputStream input = file.getInputStream()) {
@@ -43,13 +43,11 @@ public class ImageService {
         return image;
     }
 
-    // ???
-    public boolean deleteImage(UUID id) {
+    public void deleteImage(UUID id) {
         if (imageRepository.existsById(id)) {
+            dropboxService.deleteFile(imageRepository.getReferenceById(id).getImagePath());
             imageRepository.deleteById(id);
-            return true;
         }
-        return false;
     }
 
     private void checkWhetherFileIsImage(MultipartFile file) throws InputFileIsNotImageException {

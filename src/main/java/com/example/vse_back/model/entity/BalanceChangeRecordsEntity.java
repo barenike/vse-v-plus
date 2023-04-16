@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -21,13 +21,9 @@ import java.util.UUID;
 public class BalanceChangeRecordsEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue
+    @UuidGenerator
     private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
 
     @Column(name = "change_amount", nullable = false)
     private Integer changeAmount;
@@ -37,6 +33,10 @@ public class BalanceChangeRecordsEntity {
 
     @Column(name = "date")
     private LocalDateTime date;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Override
     public boolean equals(Object o) {

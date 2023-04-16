@@ -81,25 +81,57 @@ public class UserController {
         }
     }
 
-    // What's about image?
-    @Operation(summary = "Get my profile info")
+    @Operation(summary = "Get my info")
     @GetMapping("/info")
     public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
-        return new ResponseEntity<>(new InfoResponse(
+        return new ResponseEntity<>(new FullUserInfoResponse(
                 user.getId().toString(),
-                user.getRole().getRoleId(),
                 user.getEmail(),
-                user.getUserBalance(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getJobTitle(),
-                user.getInfoAbout()),
+                user.getInfoAbout(),
+                user.getImage()),
                 HttpStatus.OK);
     }
 
-    // What's about image?
+    // Test is needed
+    @Operation(summary = "Get basic info of all users")
+    @GetMapping("/info/all_users")
+    public ResponseEntity<?> getFullUserInfo() {
+        List<UserEntity> users = userService.getAllUsers();
+        List<BasicUserInfoResponse> basicInfoResponseList = users.stream().map(user -> new BasicUserInfoResponse(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName()
+        )).toList();
+        BasicAllUsersInfoResponse response = new BasicAllUsersInfoResponse(basicInfoResponseList);
+        return response.getInfoList() != null && !response.getInfoList().isEmpty()
+                ? new ResponseEntity<>(response, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // Test is needed
+    @Operation(summary = "Get full info of a user")
+    @GetMapping("/info/{userId}")
+    public ResponseEntity<?> getFullUserInfo(@PathVariable(name = "userId") String userId) {
+        UserEntity user = userService.getUserById(userId);
+        FullUserInfoResponse response = new FullUserInfoResponse(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getJobTitle(),
+                user.getInfoAbout(),
+                user.getImage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // Test is needed
     @Operation(summary = "Change my profile info")
     @PostMapping("/info/change")
     public ResponseEntity<?> changeMyInfo(@RequestHeader(name = "Authorization") String token,
@@ -125,28 +157,5 @@ public class UserController {
         UserEntity user = userService.getUserById(userId);
         userService.changeUserBalance(user, userBalanceRequest.getUserBalance(), userBalanceRequest.getCause());
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    // I think two separate methods are needed for user and admin
-    // What's about image?
-    @Operation(summary = "Get profile info of all users")
-    @GetMapping("/info/all_users")
-    public ResponseEntity<?> getAllUsersInfo() {
-        List<UserEntity> users = userService.getAllUsers();
-        List<InfoResponse> result = users.stream().map(user -> new InfoResponse(
-                user.getId().toString(),
-                user.getRole().getRoleId(),
-                user.getEmail(),
-                user.getUserBalance(),
-                user.getPhoneNumber(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getJobTitle(),
-                user.getInfoAbout()
-        )).toList();
-        InfoAllUsersResponse infoAllUsersResponse = new InfoAllUsersResponse(result);
-        return infoAllUsersResponse.getInfoList() != null && !infoAllUsersResponse.getInfoList().isEmpty()
-                ? new ResponseEntity<>(infoAllUsersResponse, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.OK);
     }
 }

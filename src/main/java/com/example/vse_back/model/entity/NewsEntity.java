@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -21,17 +21,9 @@ import java.util.UUID;
 public class NewsEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue
+    @UuidGenerator
     private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
-    @OneToOne
-    @JoinColumn(name = "image_id", nullable = false)
-    private ImageEntity image;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -41,6 +33,14 @@ public class NewsEntity {
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+    @OneToOne
+    @JoinColumn(name = "image_id", nullable = false)
+    private ImageEntity image;
 
     @Override
     public boolean equals(Object o) {

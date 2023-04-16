@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class InfoAllUsersResponse {
-    private List<InfoResponse> infoList;
+public class BasicAllUsersInfoResponse {
+    private List<BasicUserInfoResponse> infoList;
 }

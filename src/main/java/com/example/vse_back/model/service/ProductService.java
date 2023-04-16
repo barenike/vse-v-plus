@@ -48,7 +48,7 @@ public class ProductService {
         product.setPrice(productCreationRequest.getPrice());
         product.setDescription(productCreationRequest.getDescription());
         product.setAmount(productCreationRequest.getAmount());
-        ImageEntity image = imageService.createImage(productCreationRequest.getFile(), productName);
+        ImageEntity image = imageService.createImage(productCreationRequest.getFile());
         product.setImage(image);
         productRepository.save(product);
     }

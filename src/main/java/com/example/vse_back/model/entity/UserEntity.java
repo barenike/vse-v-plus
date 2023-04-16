@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -23,26 +23,13 @@ import java.util.UUID;
 public class UserEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue(generator = "uuid")
-    // Well, how can I change that?
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue
+    @UuidGenerator
     private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
-
-    @OneToOne
-    @JoinColumn(name = "image_id", nullable = false)
-    private ImageEntity image;
-
-    @OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    private Set<OrderEntity> orderSet = new HashSet<>();
-
-    @OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet = new HashSet<>();
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -68,6 +55,18 @@ public class UserEntity {
 
     @Column(name = "info_about", length = 1023)
     private String infoAbout;
+
+    @OneToOne
+    @JoinColumn(name = "image_id", nullable = false)
+    private ImageEntity image;
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private Set<OrderEntity> orderSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
