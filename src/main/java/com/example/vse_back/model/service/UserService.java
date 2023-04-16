@@ -82,10 +82,10 @@ public class UserService {
         }
     }
 
-    public UserEntity getUserById(String userId) {
-        UserEntity user = userRepository.findByUserId(UUID.fromString(userId));
+    public UserEntity getUserById(String id) {
+        UserEntity user = userRepository.findByUserId(UUID.fromString(id));
         if (user == null) {
-            throw new UserIsNotFoundException(userId);
+            throw new UserIsNotFoundException(id);
         }
         return user;
     }
@@ -98,13 +98,13 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public boolean deleteUserById(UUID userId) {
-        if (userRepository.existsById(userId)) {
-            boolean isAuthCodeDeleted = authCodeService.deleteByUserId(userId);
+    public boolean deleteUserById(UUID id) {
+        if (userRepository.existsById(id)) {
+            boolean isAuthCodeDeleted = authCodeService.deleteByUserId(id);
             if (!isAuthCodeDeleted) {
                 return false;
             }
-            userRepository.deleteById(userId);
+            userRepository.deleteById(id);
             return true;
         }
         return false;

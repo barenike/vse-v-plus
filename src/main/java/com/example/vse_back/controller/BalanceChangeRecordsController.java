@@ -25,7 +25,7 @@ public class BalanceChangeRecordsController {
         this.localUtil = localUtil;
     }
 
-    @Operation(summary = "Get the list of user balance's change records (user)")
+    @Operation(summary = "Get the list of user balance's change records")
     @GetMapping("/user/balance_change_records")
     public ResponseEntity<List<BalanceChangeRecordsEntity>> getUserBalanceChangeRecords(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
@@ -36,7 +36,7 @@ public class BalanceChangeRecordsController {
                 : new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(summary = "Get the list of user balance's change records (admin)")
+    @Operation(summary = "Get the list of user balance's change records")
     @GetMapping("/admin/balance_change_records/{userId}")
     public ResponseEntity<List<BalanceChangeRecordsEntity>> getUserBalanceChangeRecords(@PathVariable(name = "userId") UUID userId) {
         final List<BalanceChangeRecordsEntity> userBalanceRecords = balanceChangeRecordsService.getUserBalanceChangeRecordsByUserId(String.valueOf(userId));

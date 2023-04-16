@@ -33,7 +33,7 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Get user's orders (id is extracted from JWT)")
+    @Operation(summary = "Get user's orders")
     @GetMapping("/user/orders")
     public ResponseEntity<?> getMyOrders(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);

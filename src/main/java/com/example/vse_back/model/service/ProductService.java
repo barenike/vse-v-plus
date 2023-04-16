@@ -42,9 +42,8 @@ public class ProductService {
     }
 
     public void createProduct(ProductCreationRequest productCreationRequest) {
-        String productName = productCreationRequest.getName();
         ProductEntity product = new ProductEntity();
-        product.setName(productName);
+        product.setName(productCreationRequest.getName());
         product.setPrice(productCreationRequest.getPrice());
         product.setDescription(productCreationRequest.getDescription());
         product.setAmount(productCreationRequest.getAmount());

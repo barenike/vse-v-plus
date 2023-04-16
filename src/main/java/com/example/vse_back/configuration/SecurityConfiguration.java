@@ -26,10 +26,11 @@ public class SecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/admin/*", "/admin/*/*").hasRole("ADMIN")
-                .requestMatchers("/user/*", "/user/*/*").hasRole("USER")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/user/**").hasRole("USER")
                 .requestMatchers("/products", "/products/*", "/info", "/info/*").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/auth/email", "/auth/code").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

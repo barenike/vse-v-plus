@@ -60,9 +60,9 @@ public class OrderService {
     }
 
     // Refactor
-    public boolean changeOrderStatus(UUID orderId, String status) {
-        if (orderRepository.existsById(orderId)) {
-            OrderEntity order = orderRepository.getReferenceById(orderId);
+    public boolean changeOrderStatus(UUID id, String status) {
+        if (orderRepository.existsById(id)) {
+            OrderEntity order = orderRepository.getReferenceById(id);
             order.setStatus(OrderStatusEnum.valueOf(status).toString());
             if (OrderStatusEnum.CREATED.toString().equals(status)) {
                 throw new RuntimeException(); // Create new custom exception

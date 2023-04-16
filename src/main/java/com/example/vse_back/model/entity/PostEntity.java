@@ -17,8 +17,8 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "news")
-public class NewsEntity {
+@Table(name = "posts")
+public class PostEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue
@@ -46,7 +46,7 @@ public class NewsEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        NewsEntity that = (NewsEntity) o;
+        PostEntity that = (PostEntity) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 
