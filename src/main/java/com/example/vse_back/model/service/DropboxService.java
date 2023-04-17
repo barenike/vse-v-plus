@@ -5,6 +5,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.example.vse_back.exceptions.ImageDeleteFromDropboxFailedException;
 import com.example.vse_back.exceptions.ImageUploadToDropboxFailedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,10 +18,10 @@ public class DropboxService {
         this.client = client;
     }
 
-    public String uploadFile(String filePath, InputStream inputStream) {
-        try {
+    public String uploadFile(String filePath, MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
             client.files().uploadBuilder(filePath).uploadAndFinish(inputStream);
-            return client.sharing().createSharedLinkWithSettings(filePath).getUrl().replaceAll("dl=0", "raw=1");
+            return client.sharing().createSharedLinkWithSettings(filePath).getUrl().replace("dl=0", "raw=1");
         } catch (IOException | DbxException e) {
             throw new ImageUploadToDropboxFailedException(filePath, e);
         }

@@ -30,11 +30,7 @@ public class ImageService {
         String imagePath = String.format("/%s.%s", name, extension);
         String imageUrl;
 
-        try (InputStream input = file.getInputStream()) {
-            imageUrl = dropboxService.uploadFile(imagePath, input);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        imageUrl = dropboxService.uploadFile(imagePath, file);
 
         ImageEntity image = new ImageEntity();
         image.setImageUrl(imageUrl);
@@ -56,7 +52,7 @@ public class ImageService {
                 throw new InputFileIsNotImageException();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // Change this whole method? Find suitable lib?
         }
     }
 }

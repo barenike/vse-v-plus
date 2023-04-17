@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -24,13 +23,13 @@ public class ProductService {
     }
 
     public List<ProductResponse> getAllProducts() {
-        List<ProductEntity> products = productRepository.findAll();
+        final List<ProductEntity> products = productRepository.findAll();
         return products.stream().map(product -> new ProductResponse(
                 product.getId().toString(),
                 product.getName(),
                 product.getPrice(),
                 product.getImage()
-        )).collect(Collectors.toList());
+        )).toList();
     }
 
     public ProductEntity getProductById(UUID id) {

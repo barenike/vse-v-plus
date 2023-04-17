@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -65,6 +64,6 @@ public class PostService {
                 post.getDate(),
                 post.getUser().getId().toString(),
                 post.getImage()
-        )).collect(Collectors.toList());
+        )).toList();
     }
 }

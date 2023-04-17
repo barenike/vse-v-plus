@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderDetailService {
@@ -40,7 +39,7 @@ public class OrderDetailService {
 
     public List<OrderDetailEntity> getAllOrderDetailsById(UUID id) {
         List<OrderDetailEntity> allOrders = getAllOrderDetails();
-        return allOrders.stream().filter(orderDetail -> orderDetail.getId().equals(id)).collect(Collectors.toList());
+        return allOrders.stream().filter(orderDetail -> orderDetail.getId().equals(id)).toList();
     }
 
     public boolean deleteOrderDetailById(UUID id) {
