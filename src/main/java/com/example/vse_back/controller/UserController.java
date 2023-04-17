@@ -53,7 +53,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(summary = "Get JWT")
+    @Operation(summary = "Get a JWT")
     @PostMapping("/auth/code")
     public ResponseEntity<?> authCode(@RequestBody @Valid AuthCodeRequest authCodeRequest) {
         String email = authCodeRequest.getEmail();
@@ -114,8 +114,7 @@ public class UserController {
                 : new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // Test is needed
-    @Operation(summary = "Get full info of a user")
+    @Operation(summary = "Get full info of the user")
     @GetMapping("/info/{userId}")
     public ResponseEntity<?> getFullUserInfo(@PathVariable(name = "userId") String userId) {
         UserEntity user = userService.getUserById(userId);
@@ -131,11 +130,10 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // Test is needed
-    @Operation(summary = "Change my profile info")
+    @Operation(summary = "Change my profile info (you need to pass all arguments, even if they haven't changed, else they would be set to null)")
     @PostMapping("/info/change")
     public ResponseEntity<?> changeMyInfo(@RequestHeader(name = "Authorization") String token,
-                                          @RequestBody @Valid UserInfoChangeRequest userInfoChangeRequest) {
+                                          @ModelAttribute @Valid UserInfoChangeRequest userInfoChangeRequest) {
         UserEntity user = localUtil.getUserFromToken(token);
         userService.changeUserInfo(user, userInfoChangeRequest);
         return new ResponseEntity<>(HttpStatus.OK);

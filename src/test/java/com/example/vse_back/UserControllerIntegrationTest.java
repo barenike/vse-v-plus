@@ -9,10 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import java.io.InputStream;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,19 +113,97 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
-    public void changeMyInfo_Returns_200() throws Exception {
+    public void getAllUsersInfo_Returns_200() throws Exception {
         testService.createAccount();
-        JSONObject jo = new JSONObject();
-        jo.put("phoneNumber", testService.phoneNumber);
-        jo.put("firstName", testService.firstName);
-        jo.put("lastName", testService.lastName);
-        jo.put("jobTitle", testService.jobTitle);
-        jo.put("infoAbout", testService.infoAbout);
-        mvc.perform(MockMvcRequestBuilders.post("/info/change")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + testService.getUserJWT())
-                        .content(jo.toString()))
+        mvc.perform(MockMvcRequestBuilders.get("/info/all_users")
+                        .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getFullUserInfo_Returns_200() throws Exception {
+        testService.createAccount();
+        mvc.perform(MockMvcRequestBuilders.get("/info/{userId}", testService.getUserId())
+                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void changeMyInfo_Returns_200_WhenFileIsSetInsteadOfNull() throws Exception {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            testService.createAccount();
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
+            MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+            parameters.add("phoneNumber", testService.phoneNumber);
+            parameters.add("firstName", testService.firstName);
+            parameters.add("lastName", testService.lastName);
+            parameters.add("jobTitle", testService.jobTitle);
+            parameters.add("infoAbout", testService.infoAbout);
+            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+                            .file(file)
+                            .params(parameters)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + testService.getUserJWT()))
+                    .andExpect(status().isOk());
+            testService.deleteUser();
+        }
+    }
+
+    @Test
+    public void changeMyInfo_Returns_200_WhenFileIsSetInsteadOfExistingFile() throws Exception {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            testService.createAccount();
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
+            MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+            parameters.add("phoneNumber", testService.phoneNumber);
+            parameters.add("firstName", testService.firstName);
+            parameters.add("lastName", testService.lastName);
+            parameters.add("jobTitle", testService.jobTitle);
+            parameters.add("infoAbout", testService.infoAbout);
+            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+                    .file(file)
+                    .params(parameters)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer " + testService.getUserJWT()));
+            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+                            .file(file)
+                            .params(parameters)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + testService.getUserJWT()))
+                    .andExpect(status().isOk());
+            testService.deleteUser();
+        }
+    }
+
+    @Test
+    public void changeMyInfo_Returns_200_WhenNullIsSetInsteadOfAllNonNullAttributes() throws Exception {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            testService.createAccount();
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
+            MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+            parameters.add("phoneNumber", testService.phoneNumber);
+            parameters.add("firstName", testService.firstName);
+            parameters.add("lastName", testService.lastName);
+            parameters.add("jobTitle", testService.jobTitle);
+            parameters.add("infoAbout", testService.infoAbout);
+            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+                    .file(file)
+                    .params(parameters)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer " + testService.getUserJWT()));
+            MultiValueMap<String, String> nullParameters = new LinkedMultiValueMap<>();
+            nullParameters.add("phoneNumber", null);
+            nullParameters.add("firstName", null);
+            nullParameters.add("lastName", null);
+            nullParameters.add("jobTitle", null);
+            nullParameters.add("infoAbout", null);
+            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+                            .params(nullParameters)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + testService.getUserJWT()))
+                    .andExpect(status().isOk());
+            testService.deleteUser();
+        }
     }
 
     @Test
@@ -169,13 +252,5 @@ public class UserControllerIntegrationTest {
                         .header("Authorization", "Bearer " + testService.getAdminJWT())
                         .content(jo.toString()))
                 .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void getAllUsersInfo_Returns_200() throws Exception {
-        testService.createAccount();
-        mvc.perform(MockMvcRequestBuilders.get("/info/all_users")
-                        .header("Authorization", "Bearer " + testService.getUserJWT()))
-                .andExpect(status().isOk());
     }
 }

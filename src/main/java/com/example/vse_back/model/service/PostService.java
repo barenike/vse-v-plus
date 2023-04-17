@@ -35,7 +35,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public boolean deleteProductById(UUID id) {
+    public boolean deletePostById(UUID id) {
         if (postRepository.existsById(id)) {
             imageService.deleteImage(getPostById(id).getImage().getId());
             postRepository.deleteById(id);
@@ -50,6 +50,10 @@ public class PostService {
             throw new PostIsNotFoundException(id.toString());
         }
         return post;
+    }
+
+    public List<PostEntity> getPostByUserId(UUID userId) {
+        return postRepository.findByUserId(userId);
     }
 
     public List<PostResponse> getAllPosts() {

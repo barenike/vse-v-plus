@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@RestController
 public class PostController {
     private final PostService postService;
     private final LocalUtil localUtil;
@@ -35,7 +36,7 @@ public class PostController {
     @Operation(summary = "Delete the post")
     @DeleteMapping("/admin/post/{postId}")
     public ResponseEntity<?> deleteProduct(@PathVariable(name = "postId") UUID postId) {
-        final boolean isDeleted = postService.deleteProductById(postId);
+        final boolean isDeleted = postService.deletePostById(postId);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);

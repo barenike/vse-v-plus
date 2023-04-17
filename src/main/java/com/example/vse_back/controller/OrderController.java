@@ -70,9 +70,9 @@ public class OrderController {
             final boolean isChanged = orderService.changeOrderStatus(orderId, status);
             return isChanged
                     ? new ResponseEntity<>(HttpStatus.OK)
-                    : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+                    : new ResponseEntity<>(HttpStatus.NOT_MODIFIED); // I don't like this NOT_MODIFIED, should just throw an Exception
         } else {
-            final boolean isDeleted = orderService.deleteOrderById(orderId);
+            final boolean isDeleted = orderService.deleteOrderById(orderId); // But not in th delete case, I think
             return isDeleted
                     ? new ResponseEntity<>(HttpStatus.OK)
                     : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);

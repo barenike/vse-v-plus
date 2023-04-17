@@ -30,8 +30,8 @@ public class OrderEntity {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "shipping_date")
-    private LocalDateTime shippingDate;
+    @Column(name = "processing_date")
+    private LocalDateTime processingDate;
 
     @Column(name = "completion_date")
     private LocalDateTime completionDate;

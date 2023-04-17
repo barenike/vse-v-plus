@@ -85,9 +85,11 @@ public class ProductControllerIntegrationTest {
 
     @Test
     public void getAllProducts_Returns_200() throws Exception {
+        testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.get("/products")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
+        testService.deleteProduct();
     }
 
     @Test

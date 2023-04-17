@@ -1,5 +1,6 @@
 package com.example.vse_back.model.service;
 
+import com.example.vse_back.exceptions.InvalidOrderStatusException;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
 import com.example.vse_back.infrastructure.order.OrderCreationDetails;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
@@ -59,17 +60,16 @@ public class OrderService {
         return total;
     }
 
-    // Refactor
     public boolean changeOrderStatus(UUID id, String status) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getReferenceById(id);
             order.setStatus(OrderStatusEnum.valueOf(status).toString());
-            if (OrderStatusEnum.CREATED.toString().equals(status)) {
-                throw new RuntimeException(); // Create new custom exception
-            } else if (OrderStatusEnum.SHIPPED.toString().equals(status)) {
-                order.setShippingDate(getCurrentMoscowDate());
+            if (OrderStatusEnum.PROCESSING.toString().equals(status)) {
+                order.setProcessingDate(getCurrentMoscowDate());
             } else if (OrderStatusEnum.COMPLETED.toString().equals(status)) {
                 order.setCompletionDate(getCurrentMoscowDate());
+            } else {
+                throw new InvalidOrderStatusException();
             }
             orderRepository.save(order);
             return true;

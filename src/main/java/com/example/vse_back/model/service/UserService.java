@@ -2,6 +2,7 @@ package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.UserIsNotFoundException;
 import com.example.vse_back.infrastructure.user.UserInfoChangeRequest;
+import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.entity.RoleEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.RoleRepository;
@@ -67,19 +68,20 @@ public class UserService {
         user.setLastName(userInfoChangeRequest.getLastName());
         user.setJobTitle(userInfoChangeRequest.getJobTitle());
         user.setInfoAbout(userInfoChangeRequest.getInfoAbout());
-        setImage(user, userInfoChangeRequest.getFile());
+        user.setImage(setImage(user, userInfoChangeRequest.getFile())); // Do I need to transfer all this logic to original setImage? (Don't want to add business logic to entities)
         userRepository.save(user);
     }
 
-    private void setImage(UserEntity user, MultipartFile file) {
+    private ImageEntity setImage(UserEntity user, MultipartFile file) {
         if (file == null && user.getImage() != null) {
             imageService.deleteImage(user.getImage().getId());
         } else if (file != null) {
             if (user.getImage() != null) {
                 imageService.deleteImage(user.getImage().getId());
             }
-            imageService.createImage(file);
+            return imageService.createImage(file);
         }
+        return null;
     }
 
     public UserEntity getUserById(String id) {
@@ -103,6 +105,9 @@ public class UserService {
             boolean isAuthCodeDeleted = authCodeService.deleteByUserId(id);
             if (!isAuthCodeDeleted) {
                 return false;
+            }
+            if (getUserById(String.valueOf(id)).getImage() != null) {
+                imageService.deleteImage(getUserById(String.valueOf(id)).getImage().getId());
             }
             userRepository.deleteById(id);
             return true;

@@ -3,8 +3,10 @@ package com.example.vse_back;
 import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.infrastructure.product.ProductResponse;
 import com.example.vse_back.model.entity.OrderEntity;
+import com.example.vse_back.model.entity.PostEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.OrderService;
+import com.example.vse_back.model.service.PostService;
 import com.example.vse_back.model.service.ProductService;
 import com.example.vse_back.model.service.UserService;
 import com.example.vse_back.model.service.email_verification.AuthCodeService;
@@ -43,6 +45,8 @@ public class TestService {
     @Autowired
     private AuthCodeService authCodeService;
     @Autowired
+    private PostService postService;
+    @Autowired
     private JwtProvider jwtProvider;
 
     void createAccount() throws Exception {
@@ -51,6 +55,14 @@ public class TestService {
         mvc.perform(MockMvcRequestBuilders.post("/auth/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jo.toString()));
+    }
+
+    UUID getUserId() {
+        return userService.getUserByEmail(email).getId();
+    }
+
+    UUID getAdminId() {
+        return userService.getUserByEmail(adminEmail).getId();
     }
 
     void setUserBalance(Integer balance) throws Exception {
@@ -104,6 +116,10 @@ public class TestService {
         productService.deleteProductById(UUID.fromString(getProductId()));
     }
 
+    void deleteUser() {
+        userService.deleteUserById(getUserId());
+    }
+
     void createOrder() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -116,11 +132,29 @@ public class TestService {
         return orders.get(0).getId().toString();
     }
 
-    UUID getUserId() {
-        return userService.getUserByEmail(email).getId();
-    }
-
     String getCode() {
         return authCodeService.getAuthCodeByUserId(getUserId()).getCode();
+    }
+
+    void createPost() throws Exception {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
+            MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+            parameters.add("title", "Test title");
+            parameters.add("text", "Test text");
+            mvc.perform(MockMvcRequestBuilders.multipart("/admin/post")
+                    .file(file)
+                    .params(parameters)
+                    .header("Authorization", "Bearer " + getAdminJWT()));
+        }
+    }
+
+    String getPostId() {
+        List<PostEntity> posts = postService.getPostByUserId(getAdminId());
+        return posts.get(0).getId().toString();
+    }
+
+    void deletePost() {
+        postService.deletePostById(UUID.fromString(getPostId()));
     }
 }
