@@ -28,7 +28,7 @@ public class ProductService {
                 product.getId().toString(),
                 product.getName(),
                 product.getPrice(),
-                product.getImage()
+                product.getProductImage()
         )).toList();
     }
 
@@ -47,7 +47,7 @@ public class ProductService {
         product.setDescription(productCreationRequest.getDescription());
         product.setAmount(productCreationRequest.getAmount());
         ImageEntity image = imageService.createImage(productCreationRequest.getFile());
-        product.setImage(image);
+        product.setProductImage(image);
         productRepository.save(product);
     }
 
@@ -65,7 +65,7 @@ public class ProductService {
 
     public boolean deleteProductById(UUID id) {
         if (productRepository.existsById(id)) {
-            imageService.deleteImage(getProductById(id).getImage().getId());
+            imageService.deleteImage(getProductById(id).getProductImage().getId());
             productRepository.deleteById(id);
             return true;
         }

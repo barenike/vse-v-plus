@@ -42,7 +42,7 @@ public class ProductEntity {
     // I'd need a Set of them later
     @OneToOne
     @JoinColumn(name = "image_id", nullable = false)
-    private ImageEntity image;
+    private ImageEntity productImage;
 
     @Override
     public boolean equals(Object o) {
