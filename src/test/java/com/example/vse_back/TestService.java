@@ -29,6 +29,7 @@ public class TestService {
     // In production change to @chelpipegroup.com
     final String email = "lilo-games@mail.ru";
     final String adminEmail = "admin@chelpipegroup.com";
+    final String userBalance = "100";
     final String phoneNumber = "+77777777777";
     final String firstName = "Adam";
     final String lastName = "Smith";

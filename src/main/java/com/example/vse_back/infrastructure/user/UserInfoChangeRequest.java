@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class UserInfoChangeRequest {
+    private Integer userBalance;
+
     private String phoneNumber;
 
     private String firstName;

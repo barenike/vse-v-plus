@@ -9,7 +9,11 @@ import lombok.Data;
 public class FullUserInfoResponse {
     private String id;
 
+    private Integer roleId;
+
     private String email;
+
+    private Integer userBalance;
 
     private String phoneNumber;
 

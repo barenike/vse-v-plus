@@ -87,7 +87,9 @@ public class UserController {
         UserEntity user = localUtil.getUserFromToken(token);
         return new ResponseEntity<>(new FullUserInfoResponse(
                 user.getId().toString(),
+                user.getRole().getRoleId(),
                 user.getEmail(),
+                user.getUserBalance(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -120,7 +122,9 @@ public class UserController {
         UserEntity user = userService.getUserById(userId);
         FullUserInfoResponse response = new FullUserInfoResponse(
                 user.getId().toString(),
+                user.getRole().getRoleId(),
                 user.getEmail(),
+                user.getUserBalance(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
                 user.getLastName(),

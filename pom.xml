@@ -26,6 +26,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Migrate to JUnit5 -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
