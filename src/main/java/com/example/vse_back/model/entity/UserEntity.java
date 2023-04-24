@@ -64,9 +64,9 @@ public class UserEntity {
     @ToString.Exclude
     private Set<OrderEntity> orderSet = new HashSet<>();*/
 
-    @OneToMany(mappedBy = "user")
+    /*@OneToMany(mappedBy = "user")
     @ToString.Exclude
-    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet = new HashSet<>();
+    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet = new HashSet<>();*/
 
     @Override
     public boolean equals(Object o) {
