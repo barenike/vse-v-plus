@@ -60,9 +60,9 @@ public class UserEntity {
     @JoinColumn(name = "image_id", nullable = false)
     private ImageEntity image;
 
-    @OneToMany(mappedBy = "user")
+    /*@OneToMany(mappedBy = "user")
     @ToString.Exclude
-    private Set<OrderEntity> orderSet = new HashSet<>();
+    private Set<OrderEntity> orderSet = new HashSet<>();*/
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
