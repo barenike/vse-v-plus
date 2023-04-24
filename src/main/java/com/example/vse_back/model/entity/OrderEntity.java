@@ -46,9 +46,9 @@ public class OrderEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @OneToMany(mappedBy = "order")
+    /*@OneToMany(mappedBy = "order")
     @ToString.Exclude
-    private Set<OrderDetailEntity> orderDetailSet = new HashSet<>();
+    private Set<OrderDetailEntity> orderDetailSet = new HashSet<>();*/
 
     @Override
     public boolean equals(Object o) {
