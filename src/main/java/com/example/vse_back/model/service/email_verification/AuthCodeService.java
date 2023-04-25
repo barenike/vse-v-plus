@@ -26,7 +26,9 @@ public class AuthCodeService {
         authCodeRepository.save(authCode);
     }
 
-    // Null-unsafe
+    /**
+     * Null-unsafe
+     */
     public AuthCodeEntity getAuthCodeByUserId(UUID userId) {
         return authCodeRepository.findByUserId(userId);
     }

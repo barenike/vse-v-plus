@@ -9,9 +9,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -42,14 +40,9 @@ public class OrderEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
-    // Replace with id?
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
-
-    /*@OneToMany(mappedBy = "order")
-    @ToString.Exclude
-    private Set<OrderDetailEntity> orderDetailSet = new HashSet<>();*/
 
     @Override
     public boolean equals(Object o) {

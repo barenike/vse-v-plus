@@ -52,7 +52,7 @@ public class ImageService {
                 throw new InputFileIsNotImageException();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e); // Change this whole method? Find suitable lib?
+            throw new RuntimeException(e); // Change this whole method? Find a suitable lib?
         }
     }
 }

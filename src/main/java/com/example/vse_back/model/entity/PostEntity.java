@@ -34,7 +34,6 @@ public class PostEntity {
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
-    // Replace with id?
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;

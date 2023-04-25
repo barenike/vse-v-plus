@@ -9,9 +9,7 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -59,14 +57,6 @@ public class UserEntity {
     @OneToOne
     @JoinColumn(name = "image_id", nullable = false)
     private ImageEntity image;
-
-    /*@OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    private Set<OrderEntity> orderSet = new HashSet<>();*/
-
-    /*@OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet = new HashSet<>();*/
 
     @Override
     public boolean equals(Object o) {

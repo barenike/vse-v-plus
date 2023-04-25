@@ -99,7 +99,6 @@ public class UserController {
                 HttpStatus.OK);
     }
 
-    // Test is needed
     @Operation(summary = "Get basic info of all users")
     @GetMapping("/info/all_users")
     public ResponseEntity<?> getFullUserInfo() {
