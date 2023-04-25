@@ -34,6 +34,7 @@ public class AuthCodeEntity {
     @Column(name = "attempt_count", nullable = false)
     private Integer attemptCount;
 
+    // Replace with id?
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;

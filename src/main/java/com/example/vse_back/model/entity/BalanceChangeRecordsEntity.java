@@ -34,6 +34,7 @@ public class BalanceChangeRecordsEntity {
     @Column(name = "date")
     private LocalDateTime date;
 
+    // Replace with id?
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;

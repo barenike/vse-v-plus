@@ -134,7 +134,6 @@ public class UserControllerIntegrationTest {
             testService.createAccount();
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-            parameters.add("userBalance", testService.userBalance);
             parameters.add("phoneNumber", testService.phoneNumber);
             parameters.add("firstName", testService.firstName);
             parameters.add("lastName", testService.lastName);
@@ -156,7 +155,6 @@ public class UserControllerIntegrationTest {
             testService.createAccount();
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-            parameters.add("userBalance", testService.userBalance);
             parameters.add("phoneNumber", testService.phoneNumber);
             parameters.add("firstName", testService.firstName);
             parameters.add("lastName", testService.lastName);
@@ -183,7 +181,6 @@ public class UserControllerIntegrationTest {
             testService.createAccount();
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-            parameters.add("userBalance", testService.userBalance);
             parameters.add("phoneNumber", testService.phoneNumber);
             parameters.add("firstName", testService.firstName);
             parameters.add("lastName", testService.lastName);
@@ -195,7 +192,6 @@ public class UserControllerIntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + testService.getUserJWT()));
             MultiValueMap<String, String> nullParameters = new LinkedMultiValueMap<>();
-            nullParameters.add("userBalance", null);
             nullParameters.add("phoneNumber", null);
             nullParameters.add("firstName", null);
             nullParameters.add("lastName", null);

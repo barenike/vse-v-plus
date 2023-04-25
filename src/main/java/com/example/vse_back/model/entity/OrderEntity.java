@@ -42,6 +42,7 @@ public class OrderEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
+    // Replace with id?
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
