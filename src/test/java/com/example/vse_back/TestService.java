@@ -136,7 +136,10 @@ public class TestService {
     }
 
     void deleteProduct() {
-        productService.deleteProductById(UUID.fromString(getProductId()));
+        String productId = getProductId();
+        if (productId != null) {
+            productService.deleteProductById(UUID.fromString(productId));
+        }
     }
 
     void createOrder() throws Exception {
@@ -164,12 +167,18 @@ public class TestService {
         }
     }
 
-    String getPostId() {
+    UUID getPostId() {
         List<PostEntity> posts = postService.getPostByUserId(getAdminId());
-        return posts.get(0).getId().toString();
+        if (posts.size() == 0) {
+            return null;
+        }
+        return posts.get(0).getId();
     }
 
     void deletePost() {
-        postService.deletePostById(UUID.fromString(getPostId()));
+        UUID id = getPostId();
+        if (id != null) {
+            postService.deletePostById(id);
+        }
     }
 }

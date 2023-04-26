@@ -11,6 +11,7 @@ import com.example.vse_back.model.service.utils.LocalUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,19 +37,20 @@ public class PostService {
 
     public boolean deletePostById(UUID id) {
         if (postRepository.existsById(id)) {
-            imageService.deleteImage(getPostById(id).getImage().getId());
+            ImageEntity image = getPostById(id).getImage();
             postRepository.deleteById(id);
+            imageService.deleteImage(image.getId());
             return true;
         }
         return false;
     }
 
     public PostEntity getPostById(UUID id) {
-        PostEntity post = postRepository.findByPostId(id);
-        if (post == null) {
+        Optional<PostEntity> post = postRepository.findById(id);
+        if (post.isEmpty()) {
             throw new PostIsNotFoundException(id.toString());
         }
-        return post;
+        return post.get();
     }
 
     public List<PostEntity> getPostByUserId(UUID userId) {

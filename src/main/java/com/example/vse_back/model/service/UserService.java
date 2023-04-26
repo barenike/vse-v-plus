@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -82,11 +83,11 @@ public class UserService {
     }
 
     public UserEntity getUserById(String id) {
-        UserEntity user = userRepository.findByUserId(UUID.fromString(id));
-        if (user == null) {
+        Optional<UserEntity> user = userRepository.findById(UUID.fromString(id));
+        if (user.isEmpty()) {
             throw new UserIsNotFoundException(id);
         }
-        return user;
+        return user.get();
     }
 
     public UserEntity getUserByEmail(String email) {
@@ -100,10 +101,10 @@ public class UserService {
     public boolean deleteUserById(UUID id) {
         if (userRepository.existsById(id)) {
             ImageEntity image = getUserById(String.valueOf(id)).getImage();
+            userRepository.deleteById(id);
             if (image != null) {
                 imageService.deleteImage(image.getId());
             }
-            userRepository.deleteById(id);
             return true;
         }
         return false;

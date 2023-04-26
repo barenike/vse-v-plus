@@ -10,6 +10,7 @@ import com.example.vse_back.model.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,11 +34,11 @@ public class ProductService {
     }
 
     public ProductEntity getProductById(UUID id) {
-        ProductEntity product = productRepository.findByProductId(id);
-        if (product == null) {
+        Optional<ProductEntity> product = productRepository.findById(id);
+        if (product.isEmpty()) {
             throw new ProductIsNotFoundException(id.toString());
         }
-        return product;
+        return product.get();
     }
 
     public void createProduct(ProductCreationRequest productCreationRequest) {
@@ -67,8 +68,9 @@ public class ProductService {
     // Instead, shall I add some flag to DB table?
     public boolean deleteProductById(UUID id) {
         if (productRepository.existsById(id)) {
-            imageService.deleteImage(getProductById(id).getImage().getId());
+            ImageEntity image = getProductById(id).getImage();
             productRepository.deleteById(id);
+            imageService.deleteImage(image.getId());
             return true;
         }
         return false;

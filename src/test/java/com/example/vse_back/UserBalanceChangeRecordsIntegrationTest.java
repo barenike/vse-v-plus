@@ -3,24 +3,24 @@ package com.example.vse_back;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.UserService;
 import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = VseBackApplication.class)
 @AutoConfigureMockMvc
 @Transactional
-public class UserBalanceChangeRecordsIntegrationTest {
+class UserBalanceChangeRecordsIntegrationTest {
     @Autowired
     private MockMvc mvc;
 
@@ -31,7 +31,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
     private TestService testService;
 
     @Test
-    public void getMyBalanceChangeRecords_Returns_200() throws Exception {
+    void getMyBalanceChangeRecords_Returns_200() throws Exception {
         UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
@@ -48,7 +48,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
     }
 
     @Test
-    public void getBalanceChangeRecords_Returns_200() throws Exception {
+    void getBalanceChangeRecords_Returns_200() throws Exception {
         UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
