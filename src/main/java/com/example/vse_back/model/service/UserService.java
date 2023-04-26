@@ -7,7 +7,6 @@ import com.example.vse_back.model.entity.RoleEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.RoleRepository;
 import com.example.vse_back.model.repository.UserRepository;
-import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,17 +18,14 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final AuthCodeService authCodeService;
     private final ImageService imageService;
     private final BalanceChangeRecordsService balanceChangeRecordsService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       AuthCodeService authCodeService,
                        ImageService imageService, BalanceChangeRecordsService balanceChangeRecordsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.authCodeService = authCodeService;
         this.imageService = imageService;
         this.balanceChangeRecordsService = balanceChangeRecordsService;
     }
@@ -45,6 +41,7 @@ public class UserService {
         return user;
     }
 
+    // isActivated (were there at least one successful login?) and isBlocked(is user allowed to access his/her account?)
     public void enableUser(UserEntity user) {
         user.setEnabled(true);
         userRepository.save(user);
@@ -68,18 +65,18 @@ public class UserService {
         user.setLastName(userInfoChangeRequest.getLastName());
         user.setJobTitle(userInfoChangeRequest.getJobTitle());
         user.setInfoAbout(userInfoChangeRequest.getInfoAbout());
-        user.setImage(setImage(user, userInfoChangeRequest.getFile())); // Do I need to transfer all this logic to original setImage? (Don't want to add business logic to entities)
+        user.setImage(setupImage(user, userInfoChangeRequest.getFile()));
         userRepository.save(user);
     }
 
-    private ImageEntity setImage(UserEntity user, MultipartFile file) {
+    private ImageEntity setupImage(UserEntity user, MultipartFile file) {
         if (file == null && user.getImage() != null) {
             imageService.deleteImage(user.getImage().getId());
         } else if (file != null) {
             if (user.getImage() != null) {
                 imageService.deleteImage(user.getImage().getId());
             }
-            return imageService.createImage(file);
+            return imageService.createAndGetImage(file);
         }
         return null;
     }
@@ -102,12 +99,9 @@ public class UserService {
 
     public boolean deleteUserById(UUID id) {
         if (userRepository.existsById(id)) {
-            boolean isAuthCodeDeleted = authCodeService.deleteByUserId(id);
-            if (!isAuthCodeDeleted) {
-                return false;
-            }
-            if (getUserById(String.valueOf(id)).getImage() != null) {
-                imageService.deleteImage(getUserById(String.valueOf(id)).getImage().getId());
+            ImageEntity image = getUserById(String.valueOf(id)).getImage();
+            if (image != null) {
+                imageService.deleteImage(image.getId());
             }
             userRepository.deleteById(id);
             return true;

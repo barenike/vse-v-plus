@@ -1,6 +1,6 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.infrastructure.order.OrderCreationDetails;
+import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
 import com.example.vse_back.model.entity.OrderDetailEntity;
 import com.example.vse_back.model.entity.OrderEntity;
 import com.example.vse_back.model.repository.OrderDetailRepository;

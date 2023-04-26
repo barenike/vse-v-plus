@@ -29,7 +29,7 @@ public class PostService {
         post.setText(postCreationRequest.getText());
         post.setDate(LocalUtil.getCurrentMoscowDate());
         post.setUser(user);
-        ImageEntity image = imageService.createImage(postCreationRequest.getFile());
+        ImageEntity image = imageService.createAndGetImage(postCreationRequest.getFile());
         post.setImage(image);
         postRepository.save(post);
     }

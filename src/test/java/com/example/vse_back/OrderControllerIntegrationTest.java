@@ -32,7 +32,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void createOrder_Returns_201() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
@@ -45,7 +44,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void createOrder_Returns_403_When_NotEnoughCoins() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(10);
         testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
@@ -58,7 +56,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void createOrder_Returns_403_When_ProductIsNotFound() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
@@ -71,7 +68,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void getMyOrders_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -83,7 +79,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void deleteMyOrder_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -95,7 +90,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void deleteMyOrder_Returns_304_When_OrderDoesNotExist() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -107,7 +101,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_GetAllOrders_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -119,7 +112,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_GetOrdersByUserId_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -132,7 +124,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_ChangeStatus_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -146,7 +137,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_ChangeStatus_Returns_403_WhenTryingToRepeatedlySetCreatedStatus() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -169,7 +159,6 @@ public class OrderControllerIntegrationTest {
 
     @Test
     public void manipulateOrders_Delete_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();

@@ -43,12 +43,10 @@ public class AuthCodeService {
         authCodeRepository.save(authCode);
     }
 
-    public boolean deleteByUserId(UUID userId) {
+    public void deleteByUserId(UUID userId) {
         AuthCodeEntity authCode = authCodeRepository.findByUserId(userId);
         if (authCode != null) {
             authCodeRepository.deleteById(authCode.getId());
-            return true;
         }
-        return false;
     }
 }

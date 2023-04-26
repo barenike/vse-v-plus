@@ -32,8 +32,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
 
     @Test
     public void getMyBalanceChangeRecords_Returns_200() throws Exception {
-        testService.createAccount();
-        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
         jo.put("userBalance", 200);
@@ -50,8 +49,7 @@ public class UserBalanceChangeRecordsIntegrationTest {
 
     @Test
     public void getBalanceChangeRecords_Returns_200() throws Exception {
-        testService.createAccount();
-        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
         jo.put("userBalance", 200);

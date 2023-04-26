@@ -38,7 +38,7 @@ public class UserControllerIntegrationTest {
     @Test
     public void authEmail_Returns_200() throws Exception {
         JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
+        jo.put("email", testService.testUserEmail);
         mvc.perform(MockMvcRequestBuilders.post("/auth/email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jo.toString()))
@@ -47,9 +47,9 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void authCode_Returns_200() throws Exception {
-        testService.createAccount();
+        testService.createTestAccount();
         JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
+        jo.put("email", testService.testUserEmail);
         jo.put("code", testService.getCode());
         mvc.perform(MockMvcRequestBuilders.post("/auth/code")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +59,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void authCode_Returns_403_When_ThereIsNoUserWithThisEmail() throws Exception {
-        testService.createAccount();
+        testService.createTestAccount();
         JSONObject jo = new JSONObject();
         jo.put("email", "fake-email@mail.ru");
         jo.put("code", testService.getCode());
@@ -72,9 +72,8 @@ public class UserControllerIntegrationTest {
     // Can falsely fail with probability 1 / 1 000 000
     @Test
     public void authCode_Returns_403_When_AuthCodeIsInvalid() throws Exception {
-        testService.createAccount();
         JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
+        jo.put("email", testService.userEmail);
         jo.put("code", "000000");
         mvc.perform(MockMvcRequestBuilders.post("/auth/code")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,9 +84,8 @@ public class UserControllerIntegrationTest {
     // Can falsely fail with probability 3 / 1 000 000
     @Test
     public void authCode_Returns_403_When_TooManyAuthAttempts() throws Exception {
-        testService.createAccount();
         JSONObject jo = new JSONObject();
-        jo.put("email", testService.email);
+        jo.put("email", testService.userEmail);
         jo.put("code", "000000");
         mvc.perform(MockMvcRequestBuilders.post("/auth/code")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +104,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void getMyInfo_Returns_200() throws Exception {
-        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
@@ -114,7 +111,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void getAllUsersInfo_Returns_200() throws Exception {
-        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info/all_users")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
@@ -122,7 +118,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void getFullUserInfo_Returns_200() throws Exception {
-        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/info/{userId}", testService.getUserId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
@@ -131,7 +126,6 @@ public class UserControllerIntegrationTest {
     @Test
     public void changeMyInfo_Returns_200_WhenFileIsSetInsteadOfNull() throws Exception {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
-            testService.createAccount();
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
             parameters.add("phoneNumber", testService.phoneNumber);
@@ -145,14 +139,13 @@ public class UserControllerIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + testService.getUserJWT()))
                     .andExpect(status().isOk());
-            testService.deleteUser();
+            testService.nullifyUserInfo();
         }
     }
 
     @Test
     public void changeMyInfo_Returns_200_WhenFileIsSetInsteadOfExistingFile() throws Exception {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
-            testService.createAccount();
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
             parameters.add("phoneNumber", testService.phoneNumber);
@@ -171,14 +164,13 @@ public class UserControllerIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + testService.getUserJWT()))
                     .andExpect(status().isOk());
-            testService.deleteUser();
+            testService.nullifyUserInfo();
         }
     }
 
     @Test
     public void changeMyInfo_Returns_200_WhenNullIsSetInsteadOfAllNonNullAttributes() throws Exception {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
-            testService.createAccount();
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
             parameters.add("phoneNumber", testService.phoneNumber);
@@ -202,14 +194,13 @@ public class UserControllerIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + testService.getUserJWT()))
                     .andExpect(status().isOk());
-            testService.deleteUser();
         }
     }
 
     @Test
     public void deleteUser_Returns_200() throws Exception {
-        testService.createAccount();
-        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
+        testService.createTestAccount();
+        UserEntity user = userService.getUserByEmail(testService.testUserEmail);
         mvc.perform(MockMvcRequestBuilders
                         .delete("/admin/{userId}", user.getId().toString())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
@@ -218,7 +209,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void deleteUser_Returns_304_When_UserIsNotFound() throws Exception {
-        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders
                         .delete("/admin/{userId}", "c4f44950-2b80-4cf0-a060-ad99d19cc636")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
@@ -227,8 +217,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void changeUserBalance_Returns_200() throws Exception {
-        testService.createAccount();
-        UserEntity user = userService.getUserByEmail("lilo-games@mail.ru");
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId().toString());
         jo.put("userBalance", 200);
@@ -242,7 +231,6 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void changeUserBalance_Returns_403_When_UserIsNotFound() throws Exception {
-        testService.createAccount();
         JSONObject jo = new JSONObject();
         jo.put("userId", "c4f44950-2b80-4cf0-a060-ad99d19cc636");
         jo.put("userBalance", 200);

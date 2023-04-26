@@ -22,7 +22,7 @@ public class ImageService {
         this.dropboxService = dropboxService;
     }
 
-    public ImageEntity createImage(MultipartFile file) {
+    public ImageEntity createAndGetImage(MultipartFile file) {
         checkWhetherFileIsImage(file);
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());

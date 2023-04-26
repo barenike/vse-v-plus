@@ -1,4 +1,4 @@
-package com.example.vse_back.infrastructure.order;
+package com.example.vse_back.infrastructure.order_detail;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

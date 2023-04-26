@@ -39,7 +39,6 @@ public class OrderDetailControllerIntegrationTest {
 
     @Test
     public void getMyOrderDetailsByOrderId_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -51,7 +50,6 @@ public class OrderDetailControllerIntegrationTest {
 
     @Test
     public void getMyOrderDetailsByOrderId_Returns_404() throws Exception {
-        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/user/order_details/{orderId}", "fb96924c-f4a2-4576-8b8b-42b903d9a822")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isNotFound());
@@ -59,7 +57,6 @@ public class OrderDetailControllerIntegrationTest {
 
     @Test
     public void getOrderDetails_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -71,7 +68,6 @@ public class OrderDetailControllerIntegrationTest {
 
     @Test
     public void getOrderDetailById_Returns_200() throws Exception {
-        testService.createAccount();
         testService.setUserBalance(20);
         testService.createProduct();
         testService.createOrder();
@@ -84,7 +80,6 @@ public class OrderDetailControllerIntegrationTest {
 
     @Test
     public void getOrderDetailById_Returns_403_When_OrderDetailIsNotFound() throws Exception {
-        testService.createAccount();
         mvc.perform(MockMvcRequestBuilders.get("/admin/order_details/{orderDetailId}", "d6a3e216-fb57-4f0e-81c9-400b25d1b32c")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isForbidden());

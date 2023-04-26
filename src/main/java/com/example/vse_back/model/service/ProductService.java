@@ -1,7 +1,7 @@
 package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.ProductIsNotFoundException;
-import com.example.vse_back.infrastructure.order.OrderCreationDetails;
+import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
 import com.example.vse_back.infrastructure.product.ProductResponse;
 import com.example.vse_back.model.entity.ImageEntity;
@@ -46,7 +46,7 @@ public class ProductService {
         product.setPrice(productCreationRequest.getPrice());
         product.setDescription(productCreationRequest.getDescription());
         product.setAmount(productCreationRequest.getAmount());
-        ImageEntity image = imageService.createImage(productCreationRequest.getFile());
+        ImageEntity image = imageService.createAndGetImage(productCreationRequest.getFile());
         product.setImage(image);
         productRepository.save(product);
     }
@@ -63,6 +63,8 @@ public class ProductService {
         });
     }
 
+    // I think that I shouldn't delete the product in the case that it has at least one order
+    // Instead, shall I add some flag to DB table?
     public boolean deleteProductById(UUID id) {
         if (productRepository.existsById(id)) {
             imageService.deleteImage(getProductById(id).getImage().getId());

@@ -26,15 +26,16 @@ import java.util.UUID;
 
 @Service
 public class TestService {
-    // In production change to @chelpipegroup.com
-    final String email = "lilo-games@mail.ru";
+    // In production change to @chelpipegroup.com so that it would comply with the RegExp pattern
+    final String testUserEmail = "lilo-games@mail.ru";
+    final String userEmail = "user@chelpipegroup.com";
     final String adminEmail = "admin@chelpipegroup.com";
-    final String userBalance = "100";
     final String phoneNumber = "+77777777777";
     final String firstName = "Adam";
     final String lastName = "Smith";
     final String jobTitle = "Economist";
-    final String infoAbout = "Member of the Royal Society of Arts.";
+    final String infoAbout = "Member of the Royal Society of Arts";
+
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -50,16 +51,37 @@ public class TestService {
     @Autowired
     private JwtProvider jwtProvider;
 
-    void createAccount() throws Exception {
+    void createTestAccount() throws Exception {
         JSONObject jo = new JSONObject();
-        jo.put("email", email);
+        jo.put("email", testUserEmail);
         mvc.perform(MockMvcRequestBuilders.post("/auth/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jo.toString()));
     }
 
+    void nullifyUserInfo() throws Exception {
+        MultiValueMap<String, String> nullParameters = new LinkedMultiValueMap<>();
+        nullParameters.add("phoneNumber", null);
+        nullParameters.add("firstName", null);
+        nullParameters.add("lastName", null);
+        nullParameters.add("jobTitle", null);
+        nullParameters.add("infoAbout", null);
+        mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+                .params(nullParameters)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + getUserJWT()));
+    }
+
+    String getCode() {
+        return authCodeService.getAuthCodeByUserId(getTestUserId()).getCode();
+    }
+
+    UUID getTestUserId() {
+        return userService.getUserByEmail(testUserEmail).getId();
+    }
+
     UUID getUserId() {
-        return userService.getUserByEmail(email).getId();
+        return userService.getUserByEmail(userEmail).getId();
     }
 
     UUID getAdminId() {
@@ -67,7 +89,7 @@ public class TestService {
     }
 
     void setUserBalance(Integer balance) throws Exception {
-        UserEntity user = userService.getUserByEmail(email);
+        UserEntity user = userService.getUserByEmail(userEmail);
         JSONObject jo = new JSONObject();
         jo.put("userId", user.getId());
         jo.put("userBalance", balance);
@@ -79,11 +101,11 @@ public class TestService {
     }
 
     String getUserJWT() {
-        return jwtProvider.generateJwt(String.valueOf(userService.getUserByEmail(email).getId()));
+        return jwtProvider.generateJwt(String.valueOf(getUserId()));
     }
 
     String getAdminJWT() {
-        return jwtProvider.generateJwt(String.valueOf(userService.getUserByEmail(adminEmail).getId()));
+        return jwtProvider.generateJwt(String.valueOf(getAdminId()));
     }
 
     void createProduct() throws Exception {
@@ -117,10 +139,6 @@ public class TestService {
         productService.deleteProductById(UUID.fromString(getProductId()));
     }
 
-    void deleteUser() {
-        userService.deleteUserById(getUserId());
-    }
-
     void createOrder() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -131,10 +149,6 @@ public class TestService {
     String getOrderId() {
         List<OrderEntity> orders = orderService.getOrdersByUserId(getUserId());
         return orders.get(0).getId().toString();
-    }
-
-    String getCode() {
-        return authCodeService.getAuthCodeByUserId(getUserId()).getCode();
     }
 
     void createPost() throws Exception {

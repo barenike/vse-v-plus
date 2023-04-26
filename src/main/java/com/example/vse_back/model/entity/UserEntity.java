@@ -2,19 +2,19 @@ package com.example.vse_back.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity
 @Table(name = "users")
@@ -57,6 +57,27 @@ public class UserEntity {
     @OneToOne
     @JoinColumn(name = "image_id", nullable = false)
     private ImageEntity image;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private AuthCodeEntity authCode;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet;
+
+    // It won't work since I need to delete OrderDetails as well, but I'm not sure if it would align with the business logic
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<OrderEntity> orderSet;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<OrderEntity> postSet;
 
     @Override
     public boolean equals(Object o) {

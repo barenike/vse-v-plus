@@ -2,8 +2,8 @@ package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.InvalidOrderStatusException;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
-import com.example.vse_back.infrastructure.order.OrderCreationDetails;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
+import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
 import com.example.vse_back.model.entity.*;
 import com.example.vse_back.model.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -91,6 +91,7 @@ public class OrderService {
     public boolean deleteOrderById(UUID id) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getReferenceById(id);
+            // Should it be so for an admin considering that once orders' status is changed there is no way to delete an order?
             if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
                 return false;
             }
