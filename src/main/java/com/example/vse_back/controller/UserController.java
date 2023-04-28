@@ -85,7 +85,7 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
-        return new ResponseEntity<>(new FullUserInfoResponse(
+        FullUserInfoResponse response = new FullUserInfoResponse(
                 user.getId().toString(),
                 user.getRole().getRoleId(),
                 user.getEmail(),
@@ -95,8 +95,8 @@ public class UserController {
                 user.getLastName(),
                 user.getJobTitle(),
                 user.getInfoAbout(),
-                user.getImage()),
-                HttpStatus.OK);
+                user.getImage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(summary = "Get basic info of all users")
