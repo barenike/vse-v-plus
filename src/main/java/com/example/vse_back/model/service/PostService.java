@@ -11,7 +11,6 @@ import com.example.vse_back.model.service.utils.LocalUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,11 +45,11 @@ public class PostService {
     }
 
     public PostEntity getPostById(UUID id) {
-        Optional<PostEntity> post = postRepository.findById(id);
-        if (post.isEmpty()) {
+        PostEntity post = postRepository.findByPostId(id);
+        if (post == null) {
             throw new PostIsNotFoundException(id.toString());
         }
-        return post.get();
+        return post;
     }
 
     public List<PostEntity> getPostByUserId(UUID userId) {

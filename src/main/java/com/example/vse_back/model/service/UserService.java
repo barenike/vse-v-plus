@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -83,11 +82,11 @@ public class UserService {
     }
 
     public UserEntity getUserById(String id) {
-        Optional<UserEntity> user = userRepository.findById(UUID.fromString(id));
-        if (user.isEmpty()) {
+        UserEntity user = userRepository.findByUserId(UUID.fromString(id));
+        if (user == null) {
             throw new UserIsNotFoundException(id);
         }
-        return user.get();
+        return user;
     }
 
     public UserEntity getUserByEmail(String email) {

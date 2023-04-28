@@ -10,7 +10,6 @@ import com.example.vse_back.model.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,11 +33,11 @@ public class ProductService {
     }
 
     public ProductEntity getProductById(UUID id) {
-        Optional<ProductEntity> product = productRepository.findById(id);
-        if (product.isEmpty()) {
+        ProductEntity product = productRepository.findByProductId(id);
+        if (product == null) {
             throw new ProductIsNotFoundException(id.toString());
         }
-        return product.get();
+        return product;
     }
 
     public void createProduct(ProductCreationRequest productCreationRequest) {
