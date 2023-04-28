@@ -10,6 +10,8 @@ public class BasicUserInfoResponse {
 
     private String email;
 
+    private Integer userBalance;
+
     private String firstName;
 
     private String lastName;

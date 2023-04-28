@@ -101,11 +101,12 @@ public class UserController {
 
     @Operation(summary = "Get basic info of all users")
     @GetMapping("/info/all_users")
-    public ResponseEntity<?> getFullUserInfo() {
+    public ResponseEntity<?> getBasicUserInfo() {
         List<UserEntity> users = userService.getAllUsers();
         List<BasicUserInfoResponse> basicInfoResponseList = users.stream().map(user -> new BasicUserInfoResponse(
                 user.getId().toString(),
                 user.getEmail(),
+                user.getUserBalance(),
                 user.getFirstName(),
                 user.getLastName()
         )).toList();
