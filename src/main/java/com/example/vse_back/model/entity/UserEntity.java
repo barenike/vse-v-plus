@@ -32,7 +32,6 @@ public class UserEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Min(0)
     @Column(name = "user_balance", nullable = false)
     private Integer userBalance;
 
