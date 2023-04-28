@@ -85,29 +85,18 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
-        /*FullUserInfoResponse response = new FullUserInfoResponse(
+        FullUserInfoResponse response = new FullUserInfoResponse(
                 user.getId().toString(),
-                user.getRole().getRoleId(),
+                user.getRole().getRoleId().toString(),
                 user.getEmail(),
-                user.getUserBalance(),
+                user.getUserBalance().toString(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getJobTitle(),
                 user.getInfoAbout(),
-                user.getImage());*/
-        return new ResponseEntity<>(new FullUserInfoResponse(
-                user.getId().toString(),
-                user.getRole().getRoleId(),
-                user.getEmail(),
-                user.getUserBalance(),
-                user.getPhoneNumber(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getJobTitle(),
-                user.getInfoAbout(),
-                user.getImage()),
-                HttpStatus.OK);
+                user.getImage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(summary = "Get basic info of all users")
@@ -133,9 +122,9 @@ public class UserController {
         UserEntity user = userService.getUserById(userId);
         FullUserInfoResponse response = new FullUserInfoResponse(
                 user.getId().toString(),
-                user.getRole().getRoleId(),
+                user.getRole().getRoleId().toString(),
                 user.getEmail(),
-                user.getUserBalance(),
+                user.getUserBalance().toString(),
                 user.getPhoneNumber(),
                 user.getFirstName(),
                 user.getLastName(),
