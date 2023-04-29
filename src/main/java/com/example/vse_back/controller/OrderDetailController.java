@@ -42,7 +42,7 @@ public class OrderDetailController {
 
     @Operation(summary = "Get the order detail")
     @GetMapping("/admin/order_details/{orderDetailId}")
-    public ResponseEntity<?> getOrderDetailById(@PathVariable(name = "orderDetailId") UUID orderDetailId) {
+    public ResponseEntity<List<OrderDetailEntity>> getOrderDetailById(@PathVariable(name = "orderDetailId") UUID orderDetailId) {
         final List<OrderDetailEntity> orderDetails = orderDetailService.getAllOrderDetailsById(orderDetailId);
         if (orderDetails.isEmpty()) {
             throw new OrderDetailIsNotFoundException(orderDetailId);

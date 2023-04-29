@@ -26,8 +26,8 @@ public class OrderController {
 
     @Operation(summary = "Create the new order")
     @PostMapping("/user/orders")
-    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderCreationRequest orderCreationRequest,
-                                         @RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<Object> createOrder(@RequestBody @Valid OrderCreationRequest orderCreationRequest,
+                                              @RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
         orderService.createOrder(orderCreationRequest, user);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -35,7 +35,7 @@ public class OrderController {
 
     @Operation(summary = "Get user's orders")
     @GetMapping("/user/orders")
-    public ResponseEntity<?> getMyOrders(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<List<OrderEntity>> getMyOrders(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
         final List<OrderEntity> orders = orderService.getOrdersByUserId(user.getId());
         return orders != null && !orders.isEmpty()
@@ -45,7 +45,7 @@ public class OrderController {
 
     @Operation(summary = "Delete the user's order")
     @DeleteMapping("/user/orders/{orderId}")
-    public ResponseEntity<?> deleteMyOrder(@PathVariable(name = "orderId") UUID orderID) {
+    public ResponseEntity<Object> deleteMyOrder(@PathVariable(name = "orderId") UUID orderID) {
         boolean isDeleted = orderService.deleteOrderById(orderID);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)
@@ -57,9 +57,9 @@ public class OrderController {
             "orderId parameter - delete the order; " +
             "orderId and status parameters - change the order's status")
     @GetMapping("/admin/orders")
-    public ResponseEntity<?> manipulateOrders(@RequestParam(value = "userId", required = false) UUID userId,
-                                              @RequestParam(value = "orderId", required = false) UUID orderId,
-                                              @RequestParam(value = "status", required = false) String status) {
+    public ResponseEntity<List<OrderEntity>> manipulateOrders(@RequestParam(value = "userId", required = false) UUID userId,
+                                                              @RequestParam(value = "orderId", required = false) UUID orderId,
+                                                              @RequestParam(value = "status", required = false) String status) {
         if (userId == null && orderId == null) {
             final List<OrderEntity> orders = orderService.getAllOrders();
             return getListResponseEntity(orders);

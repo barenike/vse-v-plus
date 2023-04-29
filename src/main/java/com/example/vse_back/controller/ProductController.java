@@ -25,14 +25,14 @@ public class ProductController {
     // Failure tests are possibly needed
     @Operation(summary = "Create the product")
     @PostMapping("/admin/product")
-    public ResponseEntity<?> createProduct(@ModelAttribute @Valid ProductCreationRequest productCreationRequest) {
+    public ResponseEntity<Object> createProduct(@ModelAttribute @Valid ProductCreationRequest productCreationRequest) {
         productService.createProduct(productCreationRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "Set an amount of the product")
     @PostMapping("/admin/product_amount")
-    public ResponseEntity<?> setProductAmount(@RequestBody @Valid ProductAmountRequest productAmountRequest) {
+    public ResponseEntity<Object> setProductAmount(@RequestBody @Valid ProductAmountRequest productAmountRequest) {
         String productId = productAmountRequest.getProductId();
         ProductEntity product = productService.getProductById(UUID.fromString(productId));
         productService.setProductAmount(product, productAmountRequest.getAmount());
@@ -50,14 +50,14 @@ public class ProductController {
 
     @Operation(summary = "Get the product")
     @GetMapping("/products/{productId}")
-    public ResponseEntity<?> getProduct(@PathVariable(name = "productId") UUID productId) {
+    public ResponseEntity<ProductEntity> getProduct(@PathVariable(name = "productId") UUID productId) {
         final ProductEntity product = productService.getProductById(productId);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @Operation(summary = "Delete the product")
     @DeleteMapping("/admin/product/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") UUID productId) {
+    public ResponseEntity<Object> deleteProduct(@PathVariable(name = "productId") UUID productId) {
         final boolean isDeleted = productService.deleteProductById(productId);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)

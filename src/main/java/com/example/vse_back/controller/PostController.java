@@ -26,8 +26,8 @@ public class PostController {
 
     @Operation(summary = "Create the post")
     @PostMapping("/admin/post")
-    public ResponseEntity<?> createPost(@RequestHeader(name = "Authorization") String token,
-                                        @ModelAttribute @Valid PostCreationRequest postCreationRequest) {
+    public ResponseEntity<PostCreationRequest> createPost(@RequestHeader(name = "Authorization") String token,
+                                                          @ModelAttribute @Valid PostCreationRequest postCreationRequest) {
         UserEntity user = localUtil.getUserFromToken(token);
         postService.createPost(postCreationRequest, user);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -35,7 +35,7 @@ public class PostController {
 
     @Operation(summary = "Delete the post")
     @DeleteMapping("/admin/post/{postId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable(name = "postId") UUID postId) {
+    public ResponseEntity<Object> deleteProduct(@PathVariable(name = "postId") UUID postId) {
         final boolean isDeleted = postService.deletePostById(postId);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)

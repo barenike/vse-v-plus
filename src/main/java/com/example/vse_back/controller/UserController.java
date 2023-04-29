@@ -43,7 +43,7 @@ public class UserController {
 
     @Operation(summary = "Send a one-time auth code to the email address")
     @PostMapping("/auth/email")
-    public ResponseEntity<?> sendAuthCodeToEmailAddress(@RequestBody @Valid AuthEmailRequest authEmailRequest) {
+    public ResponseEntity<Object> sendAuthCodeToEmailAddress(@RequestBody @Valid AuthEmailRequest authEmailRequest) {
         UserEntity user = userService.getUserByEmail(authEmailRequest.getEmail());
         if (user == null) {
             user = userService.createUser(authEmailRequest.getEmail());
@@ -55,7 +55,7 @@ public class UserController {
 
     @Operation(summary = "Get a JWT")
     @PostMapping("/auth/code")
-    public ResponseEntity<?> authCode(@RequestBody @Valid AuthCodeRequest authCodeRequest) {
+    public ResponseEntity<AuthResponse> authCode(@RequestBody @Valid AuthCodeRequest authCodeRequest) {
         String email = authCodeRequest.getEmail();
         String inputCode = authCodeRequest.getCode();
         UserEntity user = userService.getUserByEmail(email);
@@ -83,14 +83,14 @@ public class UserController {
 
     @Operation(summary = "Get my info")
     @GetMapping("/info")
-    public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<UserEntity> getMyInfo(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Operation(summary = "Get basic info of all users")
     @GetMapping("/info/all_users")
-    public ResponseEntity<?> getBasicUserInfo() {
+    public ResponseEntity<BasicAllUsersInfoResponse> getBasicUserInfo() {
         List<UserEntity> users = userService.getAllUsers();
         List<BasicUserInfoResponse> basicInfoResponseList = users.stream().map(user -> new BasicUserInfoResponse(
                 user.getId().toString(),
@@ -107,15 +107,15 @@ public class UserController {
 
     @Operation(summary = "Get full info of the user")
     @GetMapping("/info/{userId}")
-    public ResponseEntity<?> getFullUserInfo(@PathVariable(name = "userId") String userId) {
+    public ResponseEntity<UserEntity> getFullUserInfo(@PathVariable(name = "userId") String userId) {
         UserEntity user = userService.getUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Operation(summary = "Change my profile info (you need to pass all arguments, even if they haven't changed, else they would be set to null)")
     @PostMapping("/info/change")
-    public ResponseEntity<?> changeMyInfo(@RequestHeader(name = "Authorization") String token,
-                                          @ModelAttribute @Valid UserInfoChangeRequest userInfoChangeRequest) {
+    public ResponseEntity<Object> changeMyInfo(@RequestHeader(name = "Authorization") String token,
+                                               @ModelAttribute @Valid UserInfoChangeRequest userInfoChangeRequest) {
         UserEntity user = localUtil.getUserFromToken(token);
         userService.changeUserInfo(user, userInfoChangeRequest);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -123,7 +123,7 @@ public class UserController {
 
     @Operation(summary = "Delete the user")
     @DeleteMapping("/admin/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable(name = "userId") UUID userId) {
+    public ResponseEntity<Object> deleteUser(@PathVariable(name = "userId") UUID userId) {
         final boolean isDeleted = userService.deleteUserById(userId);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)
@@ -132,7 +132,7 @@ public class UserController {
 
     @Operation(summary = "Change the user's balance")
     @PostMapping("/admin/user_balance")
-    public ResponseEntity<?> changeUserBalance(@RequestBody @Valid UserBalanceRequest userBalanceRequest) {
+    public ResponseEntity<Object> changeUserBalance(@RequestBody @Valid UserBalanceRequest userBalanceRequest) {
         String userId = userBalanceRequest.getUserId();
         UserEntity user = userService.getUserById(userId);
         userService.changeUserBalance(user, userBalanceRequest.getUserBalance(), userBalanceRequest.getCause());
