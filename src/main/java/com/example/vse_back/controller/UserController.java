@@ -85,18 +85,7 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<?> getMyInfo(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
-        FullUserInfoResponse response = new FullUserInfoResponse(
-                user.getId().toString(),
-                user.getRole().getRoleId().toString(),
-                user.getEmail(),
-                user.getUserBalance().toString(),
-                user.getPhoneNumber(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getJobTitle(),
-                user.getInfoAbout(),
-                user.getImage());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Operation(summary = "Get basic info of all users")
@@ -120,18 +109,7 @@ public class UserController {
     @GetMapping("/info/{userId}")
     public ResponseEntity<?> getFullUserInfo(@PathVariable(name = "userId") String userId) {
         UserEntity user = userService.getUserById(userId);
-        FullUserInfoResponse response = new FullUserInfoResponse(
-                user.getId().toString(),
-                user.getRole().getRoleId().toString(),
-                user.getEmail(),
-                user.getUserBalance().toString(),
-                user.getPhoneNumber(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getJobTitle(),
-                user.getInfoAbout(),
-                user.getImage());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Operation(summary = "Change my profile info (you need to pass all arguments, even if they haven't changed, else they would be set to null)")

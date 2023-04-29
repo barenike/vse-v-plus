@@ -55,7 +55,7 @@ public class UserEntity {
     private String infoAbout;
 
     @OneToOne
-    @JoinColumn(name = "image_id", nullable = false)
+    @JoinColumn(name = "image_id")
     private ImageEntity image;
 
     @Getter(AccessLevel.NONE)
@@ -77,7 +77,7 @@ public class UserEntity {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<OrderEntity> postSet;
+    private Set<PostEntity> postSet;
 
     @Override
     public boolean equals(Object o) {
