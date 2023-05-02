@@ -92,9 +92,9 @@ public class OrderService {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getReferenceById(id);
             // Should it be so for an admin considering that once orders' status is changed there is no way to delete an order?
-            if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
+            /*if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
                 return false;
-            }
+            }*/
             UserEntity user = order.getUser();
             Integer userBalance = user.getUserBalance();
             Integer total = order.getTotal();
