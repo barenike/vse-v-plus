@@ -127,18 +127,6 @@ class OrderControllerIntegrationTest {
     }
 
     @Test
-    void manipulateOrders_ChangeStatus_Returns_403_WhenTryingToRepeatedlySetCreatedStatus() throws Exception {
-        testService.setUserBalance(20);
-        testService.createProduct();
-        testService.createOrder();
-        mvc.perform(MockMvcRequestBuilders.get("/admin/orders")
-                        .param("orderId", testService.getOrderId())
-                        .param("status", "CREATED")
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void manipulateOrders_ChangeStatus_Returns_304_When_OrderDoesNotExist() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/admin/orders")
                         .param("orderId", "fb96924c-f4a2-4576-8b8b-42b903d9a822")

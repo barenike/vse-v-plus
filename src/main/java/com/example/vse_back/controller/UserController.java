@@ -132,10 +132,23 @@ public class UserController {
 
     @Operation(summary = "Change the user's balance")
     @PostMapping("/admin/user_balance")
-    public ResponseEntity<Object> changeUserBalance(@RequestBody @Valid UserBalanceRequest userBalanceRequest) {
-        String userId = userBalanceRequest.getUserId();
-        UserEntity user = userService.getUserById(userId);
-        userService.changeUserBalance(user, userBalanceRequest.getUserBalance(), userBalanceRequest.getCause());
+    public ResponseEntity<Object> changeUserBalance(@RequestHeader(name = "Authorization") String token,
+                                                    @RequestBody @Valid UserBalanceChangeRequest userBalanceChangeRequest) {
+        UserEntity subjectUser = localUtil.getUserFromToken(token);
+        String userId = userBalanceChangeRequest.getUserId();
+        UserEntity objectUser = userService.getUserById(userId);
+        userService.changeUserBalance(objectUser, subjectUser, userBalanceChangeRequest.getUserBalance(), userBalanceChangeRequest.getCause());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Transfer coins to other user")
+    @PostMapping("/user/transfer")
+    public ResponseEntity<Object> transferCoins(@RequestHeader(name = "Authorization") String token,
+                                                @RequestBody @Valid UserBalanceChangeRequest userBalanceChangeRequest) {
+        UserEntity subjectUser = localUtil.getUserFromToken(token);
+        String userId = userBalanceChangeRequest.getUserId();
+        UserEntity objectUser = userService.getUserById(userId);
+        userService.transferCoins(objectUser, subjectUser, userBalanceChangeRequest.getUserBalance(), userBalanceChangeRequest.getCause());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

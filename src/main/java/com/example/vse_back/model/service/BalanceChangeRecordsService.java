@@ -1,6 +1,6 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.model.entity.BalanceChangeRecordsEntity;
+import com.example.vse_back.model.entity.BalanceChangeRecordEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.BalanceChangeRecordsRepository;
 import org.springframework.stereotype.Service;
@@ -18,16 +18,35 @@ public class BalanceChangeRecordsService {
         this.balanceChangeRecordsRepository = balanceChangeRecordsRepository;
     }
 
-    public List<BalanceChangeRecordsEntity> getUserBalanceChangeRecordsByUserId(String userId) {
-        return balanceChangeRecordsRepository.findByUserId(UUID.fromString(userId));
+    public List<BalanceChangeRecordEntity> getBalanceChangeRecordsByUserId(String userId) {
+        return balanceChangeRecordsRepository.findByObjectUserId(UUID.fromString(userId));
     }
 
-    public void createRecord(UserEntity user, Integer newBalance, String cause) {
-        BalanceChangeRecordsEntity changeRecord = new BalanceChangeRecordsEntity();
-        changeRecord.setUser(user);
-        changeRecord.setChangeAmount(newBalance - user.getUserBalance());
+    public void createChangeBalanceRecord(UserEntity objectUser, UserEntity subjectUser, Integer newBalance, String cause) {
+        BalanceChangeRecordEntity changeRecord = new BalanceChangeRecordEntity();
+        changeRecord.setObjectUser(objectUser);
+        changeRecord.setSubjectUser(subjectUser);
+        changeRecord.setChangeAmount(newBalance - objectUser.getUserBalance());
         changeRecord.setCause(cause);
         changeRecord.setDate(getCurrentMoscowDate());
         balanceChangeRecordsRepository.save(changeRecord);
+    }
+
+    public void transferCoins(UserEntity objectUser, UserEntity subjectUser, Integer transferSum, String cause) {
+        BalanceChangeRecordEntity objectUserRecord = new BalanceChangeRecordEntity();
+        objectUserRecord.setObjectUser(objectUser);
+        objectUserRecord.setSubjectUser(subjectUser);
+        objectUserRecord.setChangeAmount(transferSum);
+        objectUserRecord.setCause(cause);
+        objectUserRecord.setDate(getCurrentMoscowDate());
+        balanceChangeRecordsRepository.save(objectUserRecord);
+
+        BalanceChangeRecordEntity subjectUserRecord = new BalanceChangeRecordEntity();
+        subjectUserRecord.setObjectUser(subjectUser);
+        subjectUserRecord.setSubjectUser(subjectUser);
+        subjectUserRecord.setChangeAmount(-transferSum);
+        subjectUserRecord.setCause("Transferred coins to " + objectUser.getEmail() + " with the cause: " + cause);
+        subjectUserRecord.setDate(getCurrentMoscowDate());
+        balanceChangeRecordsRepository.save(subjectUserRecord);
     }
 }

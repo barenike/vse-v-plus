@@ -1,13 +1,14 @@
 package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.InputFileIsNotImageException;
+import com.example.vse_back.exceptions.InvalidImageException;
 import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.repository.ImageRepository;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -23,7 +24,9 @@ public class ImageService {
     }
 
     public ImageEntity createAndGetImage(MultipartFile file) {
-        checkWhetherFileIsImage(file);
+        if (!validateImage(file)) {
+            throw new InvalidImageException();
+        }
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String name = UUID.randomUUID().toString();
@@ -46,13 +49,43 @@ public class ImageService {
         }
     }
 
-    private void checkWhetherFileIsImage(MultipartFile file) throws InputFileIsNotImageException {
+    private boolean validateImage(MultipartFile file) throws InputFileIsNotImageException {
+        if (file.getSize() > 5000000) {
+            return false;
+        }
+
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if (!isSupportedExtension(extension)) {
+            return false;
+        }
+
+        Tika tika = new Tika();
         try (InputStream input = file.getInputStream()) {
-            if (ImageIO.read(input) == null) {
-                throw new InputFileIsNotImageException();
+            String mimeType = tika.detect(input);
+            if (!isSupportedContentType(mimeType)) {
+                return false;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e); // Change this whole method? Find a suitable lib?
+            return false;
         }
+
+        return true;
+    }
+
+    private boolean isSupportedExtension(String extension) {
+        return extension != null && (
+                extension.equals("png")
+                        || extension.equals("jpg")
+                        || extension.equals("jpeg")
+                        || extension.equals("webp")
+                        || extension.equals("svg"));
+    }
+
+    private boolean isSupportedContentType(String contentType) {
+        return contentType.equals("image/png")
+                || contentType.equals("image/jpg")
+                || contentType.equals("image/jpeg")
+                || contentType.equals("image/webp")
+                || contentType.equals("image/svg+xml");
     }
 }

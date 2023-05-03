@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "balance_change_records")
-public class BalanceChangeRecordsEntity {
+public class BalanceChangeRecordEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue
@@ -33,14 +33,18 @@ public class BalanceChangeRecordsEntity {
     private LocalDateTime date;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    @JoinColumn(name = "object_user_id", nullable = false)
+    private UserEntity objectUser;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_user_id", nullable = false)
+    private UserEntity subjectUser;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        BalanceChangeRecordsEntity that = (BalanceChangeRecordsEntity) o;
+        BalanceChangeRecordEntity that = (BalanceChangeRecordEntity) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = VseBackApplication.class)
 @AutoConfigureMockMvc
 @Transactional
-class UserBalanceChangeRecordsIntegrationTest {
+class BalanceChangeRecordsIntegrationTest {
     @Autowired
     private MockMvc mvc;
 

@@ -1,5 +1,6 @@
 package com.example.vse_back.model.service;
 
+import com.example.vse_back.exceptions.NotEnoughCoinsException;
 import com.example.vse_back.exceptions.UserIsNotFoundException;
 import com.example.vse_back.infrastructure.user.UserInfoChangeRequest;
 import com.example.vse_back.model.entity.ImageEntity;
@@ -53,10 +54,29 @@ public class UserService {
     }
 
     @Transactional
-    public void changeUserBalance(UserEntity user, Integer balance, String cause) {
-        balanceChangeRecordsService.createRecord(user, balance, cause);
-        user.setUserBalance(balance);
-        userRepository.save(user);
+    public void changeUserBalance(UserEntity objectUser, UserEntity subjectUser, Integer balance, String cause) {
+        balanceChangeRecordsService.createChangeBalanceRecord(objectUser, subjectUser, balance, cause);
+        objectUser.setUserBalance(balance);
+        userRepository.save(objectUser);
+    }
+
+    @Transactional
+    public void transferCoins(UserEntity objectUser, UserEntity subjectUser, Integer transferSum, String cause) {
+        Integer subjectUserBalance = subjectUser.getUserBalance();
+
+        if (objectUser.getId().equals(subjectUser.getId())) {
+            throw new RuntimeException(); // Create custom exception
+        } else if (subjectUserBalance < transferSum) {
+            throw new NotEnoughCoinsException(subjectUserBalance);
+        }
+
+        balanceChangeRecordsService.transferCoins(objectUser, subjectUser, transferSum, cause);
+
+        objectUser.setUserBalance(objectUser.getUserBalance() + transferSum);
+        subjectUser.setUserBalance(subjectUserBalance - transferSum);
+
+        userRepository.save(objectUser);
+        userRepository.save(subjectUser);
     }
 
     public void changeUserInfo(UserEntity user, UserInfoChangeRequest userInfoChangeRequest) {

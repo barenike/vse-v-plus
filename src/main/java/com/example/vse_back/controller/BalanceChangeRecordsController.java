@@ -1,6 +1,6 @@
 package com.example.vse_back.controller;
 
-import com.example.vse_back.model.entity.BalanceChangeRecordsEntity;
+import com.example.vse_back.model.entity.BalanceChangeRecordEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.BalanceChangeRecordsService;
 import com.example.vse_back.model.service.utils.LocalUtil;
@@ -27,10 +27,10 @@ public class BalanceChangeRecordsController {
 
     @Operation(summary = "Get the list of user balance's change records")
     @GetMapping("/user/balance_change_records")
-    public ResponseEntity<List<BalanceChangeRecordsEntity>> getUserBalanceChangeRecords(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<List<BalanceChangeRecordEntity>> getUserBalanceChangeRecords(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
-        final List<BalanceChangeRecordsEntity> userBalanceRecords
-                = balanceChangeRecordsService.getUserBalanceChangeRecordsByUserId(String.valueOf(user.getId()));
+        final List<BalanceChangeRecordEntity> userBalanceRecords
+                = balanceChangeRecordsService.getBalanceChangeRecordsByUserId(String.valueOf(user.getId()));
         return userBalanceRecords != null && !userBalanceRecords.isEmpty()
                 ? new ResponseEntity<>(userBalanceRecords, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);
@@ -38,8 +38,8 @@ public class BalanceChangeRecordsController {
 
     @Operation(summary = "Get the list of user balance's change records")
     @GetMapping("/admin/balance_change_records/{userId}")
-    public ResponseEntity<List<BalanceChangeRecordsEntity>> getUserBalanceChangeRecords(@PathVariable(name = "userId") UUID userId) {
-        final List<BalanceChangeRecordsEntity> userBalanceRecords = balanceChangeRecordsService.getUserBalanceChangeRecordsByUserId(String.valueOf(userId));
+    public ResponseEntity<List<BalanceChangeRecordEntity>> getUserBalanceChangeRecords(@PathVariable(name = "userId") UUID userId) {
+        final List<BalanceChangeRecordEntity> userBalanceRecords = balanceChangeRecordsService.getBalanceChangeRecordsByUserId(String.valueOf(userId));
         return userBalanceRecords != null && !userBalanceRecords.isEmpty()
                 ? new ResponseEntity<>(userBalanceRecords, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);

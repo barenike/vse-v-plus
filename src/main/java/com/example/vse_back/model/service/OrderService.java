@@ -1,6 +1,5 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.exceptions.InvalidOrderStatusException;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
 import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
@@ -47,7 +46,7 @@ public class OrderService {
         orderRepository.save(order);
         orderDetailService.createOrderDetail(orderCreationDetails, order);
         productService.setProductAmount(orderCreationDetails);
-        userService.changeUserBalance(user, userBalance - total, "Оформление заказа");
+        userService.changeUserBalance(user, user, userBalance - total, "Оформление заказа");
     }
 
     private Integer getTotal(List<OrderCreationDetails> orderCreationDetails) {
@@ -64,12 +63,12 @@ public class OrderService {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getReferenceById(id);
             order.setStatus(OrderStatusEnum.valueOf(status).toString());
-            if (OrderStatusEnum.PROCESSING.toString().equals(status)) {
+            if (OrderStatusEnum.CREATED.toString().equals(status)) {
+                order.setCreationDate(getCurrentMoscowDate());
+            } else if (OrderStatusEnum.PROCESSING.toString().equals(status)) {
                 order.setProcessingDate(getCurrentMoscowDate());
             } else if (OrderStatusEnum.COMPLETED.toString().equals(status)) {
                 order.setCompletionDate(getCurrentMoscowDate());
-            } else {
-                throw new InvalidOrderStatusException();
             }
             orderRepository.save(order);
             return true;
@@ -88,13 +87,12 @@ public class OrderService {
 
     // Refactor
     @Transactional
-    public boolean deleteOrderById(UUID id) {
+    public boolean deleteOrderById(UUID id, UserEntity subjectUser) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getReferenceById(id);
-            // Should it be so for an admin considering that once orders' status is changed there is no way to delete an order?
-            /*if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
+            if (!order.getStatus().equals(OrderStatusEnum.CREATED.toString())) {
                 return false;
-            }*/
+            }
             UserEntity user = order.getUser();
             Integer userBalance = user.getUserBalance();
             Integer total = order.getTotal();
@@ -109,7 +107,7 @@ public class OrderService {
                 productService.setProductAmount(product, product.getAmount() + quantity);
             }
             orderRepository.deleteById(id);
-            userService.changeUserBalance(user, userBalance + total, "Отмена заказа");
+            userService.changeUserBalance(user, subjectUser, userBalance + total, "Отмена заказа");
             return true;
         } else {
             return false;

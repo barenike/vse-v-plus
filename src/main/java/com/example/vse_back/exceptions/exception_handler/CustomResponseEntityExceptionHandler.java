@@ -22,7 +22,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             AuthCodeIsInvalidException.class,
             AuthCodeIsNotFoundException.class,
             InputFileIsNotImageException.class,
-            InvalidOrderStatusException.class,
+            InvalidImageException.class,
             NotEnabledUserException.class,
             NotEnoughCoinsException.class,
             OrderDetailIsNotFoundException.class,

@@ -45,8 +45,10 @@ public class OrderController {
 
     @Operation(summary = "Delete the user's order")
     @DeleteMapping("/user/orders/{orderId}")
-    public ResponseEntity<Object> deleteMyOrder(@PathVariable(name = "orderId") UUID orderID) {
-        boolean isDeleted = orderService.deleteOrderById(orderID);
+    public ResponseEntity<Object> deleteMyOrder(@RequestHeader(name = "Authorization") String token,
+                                                @PathVariable(name = "orderId") UUID orderID) {
+        UserEntity subjectUser = localUtil.getUserFromToken(token);
+        boolean isDeleted = orderService.deleteOrderById(orderID, subjectUser);
         return isDeleted
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
@@ -57,7 +59,8 @@ public class OrderController {
             "orderId parameter - delete the order; " +
             "orderId and status parameters - change the order's status")
     @GetMapping("/admin/orders")
-    public ResponseEntity<List<OrderEntity>> manipulateOrders(@RequestParam(value = "userId", required = false) UUID userId,
+    public ResponseEntity<List<OrderEntity>> manipulateOrders(@RequestHeader(name = "Authorization") String token,
+                                                              @RequestParam(value = "userId", required = false) UUID userId,
                                                               @RequestParam(value = "orderId", required = false) UUID orderId,
                                                               @RequestParam(value = "status", required = false) String status) {
         if (userId == null && orderId == null) {
@@ -72,7 +75,8 @@ public class OrderController {
                     ? new ResponseEntity<>(HttpStatus.OK)
                     : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         } else {
-            final boolean isDeleted = orderService.deleteOrderById(orderId);
+            UserEntity subjectUser = localUtil.getUserFromToken(token);
+            final boolean isDeleted = orderService.deleteOrderById(orderId, subjectUser);
             return isDeleted
                     ? new ResponseEntity<>(HttpStatus.OK)
                     : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);

@@ -241,4 +241,40 @@ class UserControllerIntegrationTest {
                         .content(jo.toString()))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void transferCoins_Returns_200() throws Exception {
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
+        user.setUserBalance(200);
+
+        testService.createTestAccount();
+
+        JSONObject jo = new JSONObject();
+        jo.put("userId", testService.getTestUserId());
+        jo.put("userBalance", 200);
+        jo.put("cause", "Тест");
+        mvc.perform(MockMvcRequestBuilders.post("/user/transfer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + testService.getUserJWT())
+                        .content(jo.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void transferCoins_Returns_403_When_NotEnoughCoins() throws Exception {
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
+        user.setUserBalance(200);
+
+        testService.createTestAccount();
+
+        JSONObject jo = new JSONObject();
+        jo.put("userId", testService.getTestUserId());
+        jo.put("userBalance", 201);
+        jo.put("cause", "Тест");
+        mvc.perform(MockMvcRequestBuilders.post("/user/transfer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + testService.getUserJWT())
+                        .content(jo.toString()))
+                .andExpect(status().isForbidden());
+    }
 }

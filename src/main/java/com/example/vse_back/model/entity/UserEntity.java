@@ -65,8 +65,8 @@ public class UserEntity {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<BalanceChangeRecordsEntity> balanceChangeRecordSet;
+    @OneToMany(mappedBy = "objectUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<BalanceChangeRecordEntity> balanceChangeRecordSet;
 
     // It won't work since I need to delete OrderDetails as well, but I'm not sure if it would align with the business logic
     @Getter(AccessLevel.NONE)
