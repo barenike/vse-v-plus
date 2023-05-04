@@ -1,6 +1,7 @@
 package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.EntityIsNotFoundException;
+import com.example.vse_back.infrastructure.user_badge.UserBadgeStatusChangeRequest;
 import com.example.vse_back.model.entity.BadgeEntity;
 import com.example.vse_back.model.entity.UserBadgeEntity;
 import com.example.vse_back.model.entity.UserEntity;
@@ -59,9 +60,9 @@ public class UserBadgeService {
         return userBadgeRepository.findByUserId(id);
     }
 
-    public void activateUserBadge(UUID userBadgeId) {
-        UserBadgeEntity userBadge = getUserBadgeById(userBadgeId);
-        userBadge.setIsActivated(true);
+    public void changeUserBadgeStatus(UserBadgeStatusChangeRequest request) {
+        UserBadgeEntity userBadge = getUserBadgeById(UUID.fromString(request.getUserBadgeId()));
+        userBadge.setIsActivated(request.isActivated());
         userBadgeRepository.save(userBadge);
     }
 

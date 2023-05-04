@@ -2,12 +2,14 @@ package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.EntityIsNotFoundException;
 import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
+import com.example.vse_back.infrastructure.product.ProductChangeRequest;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
 import com.example.vse_back.infrastructure.product.ProductResponse;
 import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.entity.ProductEntity;
 import com.example.vse_back.model.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,15 +53,32 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public void setProductAmount(ProductEntity product, Integer amount) {
+    public void changeProduct(ProductChangeRequest productChangeRequest) {
+        ProductEntity product = getProductById(UUID.fromString(productChangeRequest.getProductId()));
+        product.setName(productChangeRequest.getName());
+        product.setPrice(productChangeRequest.getPrice());
+        product.setDescription(productChangeRequest.getDescription());
+        product.setAmount(productChangeRequest.getAmount());
+        product.setImage(setupImage(product, productChangeRequest.getFile()));
+        productRepository.save(product);
+    }
+
+    private ImageEntity setupImage(ProductEntity product, MultipartFile file) {
+        if (product.getImage() != null) {
+            imageService.deleteImage(product.getImage().getId());
+        }
+        return imageService.createAndGetImage(file);
+    }
+
+    public void setupProductAmount(ProductEntity product, Integer amount) {
         product.setAmount(amount);
         productRepository.save(product);
     }
 
-    public void setProductAmount(List<OrderCreationDetails> orderCreationDetails) {
+    public void setupProductAmount(List<OrderCreationDetails> orderCreationDetails) {
         orderCreationDetails.forEach(detail -> {
             ProductEntity product = getProductById(UUID.fromString(detail.getProductId()));
-            setProductAmount(product, product.getAmount() - detail.getQuantity());
+            setupProductAmount(product, product.getAmount() - detail.getQuantity());
         });
     }
 

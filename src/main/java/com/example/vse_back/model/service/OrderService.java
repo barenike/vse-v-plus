@@ -45,7 +45,7 @@ public class OrderService {
         order.setTotal(total);
         orderRepository.save(order);
         orderDetailService.createOrderDetail(orderCreationDetails, order);
-        productService.setProductAmount(orderCreationDetails);
+        productService.setupProductAmount(orderCreationDetails);
         userService.changeUserBalance(user, user, userBalance - total, "Оформление заказа");
     }
 
@@ -104,7 +104,7 @@ public class OrderService {
                 if (!isDeleted) {
                     return false;
                 }
-                productService.setProductAmount(product, product.getAmount() + quantity);
+                productService.setupProductAmount(product, product.getAmount() + quantity);
             }
             orderRepository.deleteById(id);
             userService.changeUserBalance(user, subjectUser, userBalance + total, "Отмена заказа");

@@ -2,10 +2,7 @@ package com.example.vse_back;
 
 import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.infrastructure.product.ProductResponse;
-import com.example.vse_back.model.entity.BadgeEntity;
-import com.example.vse_back.model.entity.OrderEntity;
-import com.example.vse_back.model.entity.PostEntity;
-import com.example.vse_back.model.entity.UserEntity;
+import com.example.vse_back.model.entity.*;
 import com.example.vse_back.model.service.*;
 import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.json.JSONObject;
@@ -48,6 +45,8 @@ public class TestService {
     private PostService postService;
     @Autowired
     private BadgeService badgeService;
+    @Autowired
+    private UserBadgeService userBadgeService;
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -209,5 +208,14 @@ public class TestService {
         if (id != null) {
             badgeService.deleteBadgeById(id);
         }
+    }
+
+    UUID getUserBadgeId() {
+        List<UserBadgeEntity> userBadges = userBadgeService.getUserBadgesByUserId(getUserId());
+        int size = userBadges.size();
+        if (size == 0) {
+            return null;
+        }
+        return userBadges.get(size - 1).getId();
     }
 }

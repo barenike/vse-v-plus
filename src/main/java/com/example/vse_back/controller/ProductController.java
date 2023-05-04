@@ -1,6 +1,6 @@
 package com.example.vse_back.controller;
 
-import com.example.vse_back.infrastructure.product.ProductAmountRequest;
+import com.example.vse_back.infrastructure.product.ProductChangeRequest;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
 import com.example.vse_back.infrastructure.product.ProductResponse;
 import com.example.vse_back.model.entity.ProductEntity;
@@ -30,12 +30,11 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Set an amount of the product")
-    @PostMapping("/admin/product_amount")
-    public ResponseEntity<Object> setProductAmount(@RequestBody @Valid ProductAmountRequest productAmountRequest) {
-        String productId = productAmountRequest.getProductId();
-        ProductEntity product = productService.getProductById(UUID.fromString(productId));
-        productService.setProductAmount(product, productAmountRequest.getAmount());
+    // Failure tests are possibly needed
+    @Operation(summary = "Change the product")
+    @PostMapping("/admin/product/change")
+    public ResponseEntity<Object> changeProduct(@ModelAttribute @Valid ProductChangeRequest productChangeRequest) {
+        productService.changeProduct(productChangeRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

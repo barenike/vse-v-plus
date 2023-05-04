@@ -1,16 +1,15 @@
 package com.example.vse_back.controller;
 
+import com.example.vse_back.infrastructure.user_badge.UserBadgeStatusChangeRequest;
 import com.example.vse_back.model.entity.UserBadgeEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.UserBadgeService;
 import com.example.vse_back.model.service.utils.LocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,7 @@ public class UserBadgeController {
     }
 
     @Operation(summary = "Get badges of the user")
-    @GetMapping("/user/user_badges/{userId}")
+    @GetMapping("/user_badges/{userId}")
     public ResponseEntity<List<UserBadgeEntity>> getUserBadges(@PathVariable(name = "userId") UUID userId) {
         final List<UserBadgeEntity> userBadges = userBadgeService.getUserBadgesByUserId(userId);
         return userBadges != null && !userBadges.isEmpty()
@@ -44,11 +43,10 @@ public class UserBadgeController {
                 : new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // And what about deactivation?
-    @Operation(summary = "Activate user's badge")
-    @GetMapping("/admin/user_badge/{userBadgeId}")
-    public ResponseEntity<Object> activateUserBadge(@PathVariable(name = "userBadgeId") UUID userBadgeId) {
-        userBadgeService.activateUserBadge(userBadgeId);
+    @Operation(summary = "Activate/deactivate user's badge")
+    @PostMapping("/admin/user_badge")
+    public ResponseEntity<Object> changeIsActivatedFieldInUserBadge(@RequestBody @Valid UserBadgeStatusChangeRequest request) {
+        userBadgeService.changeUserBadgeStatus(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

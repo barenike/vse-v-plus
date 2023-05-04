@@ -1,13 +1,11 @@
 package com.example.vse_back;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -54,29 +52,22 @@ class ProductControllerIntegrationTest {
     }
 
     @Test
-    void changeProductAmount_Returns_200() throws Exception {
+    void changeProduct_Returns_200() throws Exception {
         testService.createProduct();
-        JSONObject jo = new JSONObject();
-        jo.put("productId", testService.getProductId());
-        jo.put("amount", 500);
-        mvc.perform(MockMvcRequestBuilders.post("/admin/product_amount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString())
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void changeProductAmount_Returns_403_When_ProductDoesNotExist() throws Exception {
-        testService.createProduct();
-        JSONObject jo = new JSONObject();
-        jo.put("productId", "a04096a1-014c-40a8-8471-46dbf85113b4");
-        jo.put("amount", 500);
-        mvc.perform(MockMvcRequestBuilders.post("/admin/product_amount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString())
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isForbidden());
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
+            MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+            parameters.add("productId", testService.getProductId());
+            parameters.add("name", "Test product");
+            parameters.add("price", "100");
+            parameters.add("description", "Test product description");
+            parameters.add("amount", "10");
+            mvc.perform(MockMvcRequestBuilders.multipart("/admin/product/change")
+                            .file(file)
+                            .params(parameters)
+                            .header("Authorization", "Bearer " + testService.getAdminJWT()))
+                    .andExpect(status().isOk());
+        }
     }
 
     @Test
