@@ -1,13 +1,14 @@
 package com.example.vse_back.model.service;
 
+import com.example.vse_back.exceptions.EntityIsNotFoundException;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
-import com.example.vse_back.exceptions.UserIsNotFoundException;
 import com.example.vse_back.infrastructure.user.UserInfoChangeRequest;
 import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.entity.RoleEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.RoleRepository;
 import com.example.vse_back.model.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,9 +23,13 @@ public class UserService {
     private final ImageService imageService;
     private final BalanceChangeRecordsService balanceChangeRecordsService;
 
+    @Autowired
+    private UserBadgeService userBadgeService;
+
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       ImageService imageService, BalanceChangeRecordsService balanceChangeRecordsService) {
+                       ImageService imageService,
+                       BalanceChangeRecordsService balanceChangeRecordsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.imageService = imageService;
@@ -39,6 +44,7 @@ public class UserService {
         user.setEmail(email);
         user.setUserBalance(0);
         userRepository.save(user);
+        userBadgeService.addBadgesToNewUser(user);
         return user;
     }
 
@@ -104,7 +110,7 @@ public class UserService {
     public UserEntity getUserById(String id) {
         UserEntity user = userRepository.findByUserId(UUID.fromString(id));
         if (user == null) {
-            throw new UserIsNotFoundException(id);
+            throw new EntityIsNotFoundException("user", id);
         }
         return user;
     }

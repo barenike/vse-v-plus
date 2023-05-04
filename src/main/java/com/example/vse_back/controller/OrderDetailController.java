@@ -1,6 +1,6 @@
 package com.example.vse_back.controller;
 
-import com.example.vse_back.exceptions.OrderDetailIsNotFoundException;
+import com.example.vse_back.exceptions.EntityIsNotFoundException;
 import com.example.vse_back.model.entity.OrderDetailEntity;
 import com.example.vse_back.model.service.OrderDetailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class OrderDetailController {
     public ResponseEntity<List<OrderDetailEntity>> getOrderDetailById(@PathVariable(name = "orderDetailId") UUID orderDetailId) {
         final List<OrderDetailEntity> orderDetails = orderDetailService.getAllOrderDetailsById(orderDetailId);
         if (orderDetails.isEmpty()) {
-            throw new OrderDetailIsNotFoundException(orderDetailId);
+            throw new EntityIsNotFoundException("order detail", orderDetailId.toString());
         }
         return new ResponseEntity<>(orderDetails, HttpStatus.OK);
     }

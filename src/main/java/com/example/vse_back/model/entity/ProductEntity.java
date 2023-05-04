@@ -37,7 +37,7 @@ public class ProductEntity {
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
-    // I'd need a Set of them later
+    // I'd probably need a Set of them later
     @OneToOne
     @JoinColumn(name = "image_id", nullable = false)
     private ImageEntity image;

@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,28 +14,20 @@ import java.util.UUID;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Table(name = "posts")
-public class PostEntity {
+@Table(name = "badges")
+public class BadgeEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
     @GeneratedValue
     @UuidGenerator
     private UUID id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(name = "text", nullable = false, length = 255999)
-    private String text;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "date", nullable = false)
-    private LocalDateTime date;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
-    // I'd probably need a Set of them later
     @OneToOne
     @JoinColumn(name = "image_id")
     private ImageEntity image;
@@ -45,8 +36,8 @@ public class PostEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        PostEntity that = (PostEntity) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        BadgeEntity that = (BadgeEntity) o;
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override

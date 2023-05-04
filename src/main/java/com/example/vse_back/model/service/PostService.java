@@ -1,14 +1,15 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.exceptions.PostIsNotFoundException;
-import com.example.vse_back.infrastructure.posts.PostCreationRequest;
-import com.example.vse_back.infrastructure.posts.PostResponse;
+import com.example.vse_back.exceptions.EntityIsNotFoundException;
+import com.example.vse_back.infrastructure.post.PostCreationRequest;
+import com.example.vse_back.infrastructure.post.PostEditRequest;
 import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.entity.PostEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.PostRepository;
 import com.example.vse_back.model.service.utils.LocalUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,11 +35,34 @@ public class PostService {
         postRepository.save(post);
     }
 
+    public void editPost(PostEditRequest postEditRequest) {
+        PostEntity post = getPostById(UUID.fromString(postEditRequest.getPostId()));
+        post.setTitle(postEditRequest.getTitle());
+        post.setText(postEditRequest.getText());
+        post.setImage(setupImage(post, postEditRequest.getFile()));
+        postRepository.save(post);
+    }
+
+    // Create interface with this method and make it implemented by PostService and UserService?
+    private ImageEntity setupImage(PostEntity post, MultipartFile file) {
+        if (file == null && post.getImage() != null) {
+            imageService.deleteImage(post.getImage().getId());
+        } else if (file != null) {
+            if (post.getImage() != null) {
+                imageService.deleteImage(post.getImage().getId());
+            }
+            return imageService.createAndGetImage(file);
+        }
+        return null;
+    }
+
     public boolean deletePostById(UUID id) {
         if (postRepository.existsById(id)) {
             ImageEntity image = getPostById(id).getImage();
             postRepository.deleteById(id);
-            imageService.deleteImage(image.getId());
+            if (image != null) {
+                imageService.deleteImage(image.getId());
+            }
             return true;
         }
         return false;
@@ -47,7 +71,7 @@ public class PostService {
     public PostEntity getPostById(UUID id) {
         PostEntity post = postRepository.findByPostId(id);
         if (post == null) {
-            throw new PostIsNotFoundException(id.toString());
+            throw new EntityIsNotFoundException("post", id.toString());
         }
         return post;
     }
@@ -56,15 +80,7 @@ public class PostService {
         return postRepository.findByUserId(userId);
     }
 
-    public List<PostResponse> getAllPosts() {
-        List<PostEntity> products = postRepository.findAll();
-        return products.stream().map(post -> new PostResponse(
-                post.getId().toString(),
-                post.getTitle(),
-                post.getText(),
-                post.getDate(),
-                post.getUser().getId().toString(),
-                post.getImage()
-        )).toList();
+    public List<PostEntity> getAllPosts() {
+        return postRepository.findAll();
     }
 }

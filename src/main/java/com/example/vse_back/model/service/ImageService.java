@@ -1,6 +1,5 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.exceptions.InputFileIsNotImageException;
 import com.example.vse_back.exceptions.InvalidImageException;
 import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.repository.ImageRepository;
@@ -49,7 +48,8 @@ public class ImageService {
         }
     }
 
-    private boolean validateImage(MultipartFile file) throws InputFileIsNotImageException {
+    // I don't think that this is enough. Read https://portswigger.net/web-security/file-upload
+    private boolean validateImage(MultipartFile file) {
         if (file.getSize() > 5000000) {
             return false;
         }

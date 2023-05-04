@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = VseBackApplication.class)
 @AutoConfigureMockMvc
 @Transactional
-class PostControllerIntegrationTest {
+class BadgeControllerIntegrationTest {
     @Autowired
     private MockMvc mvc;
 
@@ -32,17 +32,17 @@ class PostControllerIntegrationTest {
 
     @AfterEach
     void cleanup() {
-        testService.deletePost();
+        testService.deleteBadge();
     }
 
     @Test
-    void createPost_Returns_201() throws Exception {
+    void createBadge_Returns_201() throws Exception {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-            parameters.add("title", "Test title");
-            parameters.add("text", "Test text");
-            mvc.perform(MockMvcRequestBuilders.multipart("/admin/post")
+            parameters.add("name", "Test name");
+            parameters.add("description", "Test description");
+            mvc.perform(MockMvcRequestBuilders.multipart("/admin/badge/create")
                             .file(file)
                             .params(parameters)
                             .header("Authorization", "Bearer " + testService.getAdminJWT()))
@@ -51,15 +51,15 @@ class PostControllerIntegrationTest {
     }
 
     @Test
-    void editPost_Returns_200() throws Exception {
-        testService.createPost();
+    void editBadge_Returns_200() throws Exception {
+        testService.createBadge();
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-        parameters.add("postId", String.valueOf(testService.getPostId()));
-        parameters.add("title", "New test title");
-        parameters.add("text", "New test text");
+        parameters.add("badgeId", String.valueOf(testService.getBadgeId()));
+        parameters.add("name", "New test name");
+        parameters.add("description", "New test description");
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
-            mvc.perform(MockMvcRequestBuilders.multipart("/admin/post/edit")
+            mvc.perform(MockMvcRequestBuilders.multipart("/admin/badge/edit")
                             .file(file)
                             .params(parameters)
                             .header("Authorization", "Bearer " + testService.getAdminJWT()))
@@ -68,17 +68,17 @@ class PostControllerIntegrationTest {
     }
 
     @Test
-    void deletePost_Returns_200() throws Exception {
-        testService.createPost();
-        mvc.perform(MockMvcRequestBuilders.delete("/admin/post/{postId}", testService.getPostId())
+    void deleteBadge_Returns_200() throws Exception {
+        testService.createBadge();
+        mvc.perform(MockMvcRequestBuilders.delete("/admin/badge/{badgeId}", testService.getBadgeId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void getAllPosts_Returns_200() throws Exception {
-        testService.createPost();
-        mvc.perform(MockMvcRequestBuilders.get("/posts")
+    void getAllBadges_Returns_200() throws Exception {
+        testService.createBadge();
+        mvc.perform(MockMvcRequestBuilders.get("/admin/badges")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }

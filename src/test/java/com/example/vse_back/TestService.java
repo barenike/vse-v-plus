@@ -2,13 +2,11 @@ package com.example.vse_back;
 
 import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.infrastructure.product.ProductResponse;
+import com.example.vse_back.model.entity.BadgeEntity;
 import com.example.vse_back.model.entity.OrderEntity;
 import com.example.vse_back.model.entity.PostEntity;
 import com.example.vse_back.model.entity.UserEntity;
-import com.example.vse_back.model.service.OrderService;
-import com.example.vse_back.model.service.PostService;
-import com.example.vse_back.model.service.ProductService;
-import com.example.vse_back.model.service.UserService;
+import com.example.vse_back.model.service.*;
 import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +46,8 @@ public class TestService {
     private AuthCodeService authCodeService;
     @Autowired
     private PostService postService;
+    @Autowired
+    private BadgeService badgeService;
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -179,6 +179,35 @@ public class TestService {
         UUID id = getPostId();
         if (id != null) {
             postService.deletePostById(id);
+        }
+    }
+
+    void createBadge() throws Exception {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
+            MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
+            MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+            parameters.add("name", "Test name");
+            parameters.add("description", "Test description");
+            mvc.perform(MockMvcRequestBuilders.multipart("/admin/badge/create")
+                    .file(file)
+                    .params(parameters)
+                    .header("Authorization", "Bearer " + getAdminJWT()));
+        }
+    }
+
+    UUID getBadgeId() {
+        List<BadgeEntity> badges = badgeService.getAllBadges();
+        int size = badges.size();
+        if (size == 0) {
+            return null;
+        }
+        return badges.get(size - 1).getId();
+    }
+
+    void deleteBadge() {
+        UUID id = getBadgeId();
+        if (id != null) {
+            badgeService.deleteBadgeById(id);
         }
     }
 }

@@ -26,9 +26,7 @@ public class AuthListener implements ApplicationListener<OnRegistrationCompleteE
 
     private void sendAuthCode(final OnRegistrationCompleteEvent event) {
         UserEntity user = event.getUser();
-        String code = RandomStringUtils.random(6, false, true);
-        SecureRandom random = new SecureRandom();
-        RandomStringUtils.random(6, 0, 0, false, true, null, random);
+        String code = RandomStringUtils.random(6, 0, 0, false, true, null, new SecureRandom());
         authCodeService.createCode(user, code);
         SimpleMailMessage email = constructEmailMessage(user, code);
         mailSender.send(email);

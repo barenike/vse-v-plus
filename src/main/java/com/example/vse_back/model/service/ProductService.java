@@ -1,6 +1,6 @@
 package com.example.vse_back.model.service;
 
-import com.example.vse_back.exceptions.ProductIsNotFoundException;
+import com.example.vse_back.exceptions.EntityIsNotFoundException;
 import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
 import com.example.vse_back.infrastructure.product.ProductResponse;
@@ -35,7 +35,7 @@ public class ProductService {
     public ProductEntity getProductById(UUID id) {
         ProductEntity product = productRepository.findByProductId(id);
         if (product == null) {
-            throw new ProductIsNotFoundException(id.toString());
+            throw new EntityIsNotFoundException("product", id.toString());
         }
         return product;
     }

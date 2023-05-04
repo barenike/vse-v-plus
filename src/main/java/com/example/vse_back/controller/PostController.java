@@ -1,7 +1,8 @@
 package com.example.vse_back.controller;
 
-import com.example.vse_back.infrastructure.posts.PostCreationRequest;
-import com.example.vse_back.infrastructure.posts.PostResponse;
+import com.example.vse_back.infrastructure.post.PostCreationRequest;
+import com.example.vse_back.infrastructure.post.PostEditRequest;
+import com.example.vse_back.model.entity.PostEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.PostService;
 import com.example.vse_back.model.service.utils.LocalUtil;
@@ -33,6 +34,14 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // Tests are needed!
+    @Operation(summary = "Edit the post")
+    @PostMapping("/admin/post/edit")
+    public ResponseEntity<PostCreationRequest> editPost(@ModelAttribute @Valid PostEditRequest postEditRequest) {
+        postService.editPost(postEditRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @Operation(summary = "Delete the post")
     @DeleteMapping("/admin/post/{postId}")
     public ResponseEntity<Object> deleteProduct(@PathVariable(name = "postId") UUID postId) {
@@ -44,8 +53,8 @@ public class PostController {
 
     @Operation(summary = "Get all posts")
     @GetMapping("/posts")
-    public ResponseEntity<List<PostResponse>> getAllProducts() {
-        final List<PostResponse> posts = postService.getAllPosts();
+    public ResponseEntity<List<PostEntity>> getAllProducts() {
+        final List<PostEntity> posts = postService.getAllPosts();
         return posts != null && !posts.isEmpty()
                 ? new ResponseEntity<>(posts, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);

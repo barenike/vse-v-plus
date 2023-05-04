@@ -10,7 +10,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -54,6 +53,7 @@ public class UserEntity {
     @Column(name = "info_about", length = 1023)
     private String infoAbout;
 
+    // I'd probably need a Set of them later
     @OneToOne
     @JoinColumn(name = "image_id")
     private ImageEntity image;
@@ -62,22 +62,6 @@ public class UserEntity {
     @Setter(AccessLevel.NONE)
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private AuthCodeEntity authCode;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy = "objectUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<BalanceChangeRecordEntity> balanceChangeRecordSet;
-
-    // It won't work since I need to delete OrderDetails as well, but I'm not sure if it would align with the business logic
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<OrderEntity> orderSet;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<PostEntity> postSet;
 
     @Override
     public boolean equals(Object o) {
