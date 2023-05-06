@@ -23,13 +23,21 @@ public class BalanceChangeRecordsService {
     }
 
     public void createChangeBalanceRecord(UserEntity objectUser, UserEntity subjectUser, Integer newBalance, String cause) {
-        BalanceChangeRecordEntity changeRecord = new BalanceChangeRecordEntity();
-        changeRecord.setObjectUser(objectUser);
-        changeRecord.setSubjectUser(subjectUser);
-        changeRecord.setChangeAmount(newBalance - objectUser.getUserBalance());
-        changeRecord.setCause(cause);
-        changeRecord.setDate(getCurrentMoscowDate());
-        balanceChangeRecordsRepository.save(changeRecord);
+        BalanceChangeRecordEntity objectUserRecord = new BalanceChangeRecordEntity();
+        objectUserRecord.setObjectUser(objectUser);
+        objectUserRecord.setSubjectUser(subjectUser);
+        objectUserRecord.setChangeAmount(newBalance - objectUser.getUserBalance());
+        objectUserRecord.setCause(cause);
+        objectUserRecord.setDate(getCurrentMoscowDate());
+        balanceChangeRecordsRepository.save(objectUserRecord);
+
+        BalanceChangeRecordEntity subjectUserRecord = new BalanceChangeRecordEntity();
+        subjectUserRecord.setObjectUser(subjectUser);
+        subjectUserRecord.setSubjectUser(subjectUser);
+        subjectUserRecord.setChangeAmount(newBalance - objectUser.getUserBalance());
+        subjectUserRecord.setCause("Changed the balance of a user with an email " + objectUser.getEmail() + " with the cause: " + cause);
+        subjectUserRecord.setDate(getCurrentMoscowDate());
+        balanceChangeRecordsRepository.save(subjectUserRecord);
     }
 
     public void transferCoins(UserEntity objectUser, UserEntity subjectUser, Integer transferSum, String cause) {

@@ -26,7 +26,7 @@ public class BalanceChangeRecordsController {
     }
 
     @Operation(summary = "Get the list of user balance's change records")
-    @GetMapping("/user/balance_change_records")
+    @GetMapping("/balance_change_records")
     public ResponseEntity<List<BalanceChangeRecordEntity>> getUserBalanceChangeRecords(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
         final List<BalanceChangeRecordEntity> userBalanceRecords

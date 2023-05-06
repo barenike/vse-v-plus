@@ -42,7 +42,7 @@ class BalanceChangeRecordsIntegrationTest {
                 .header("Authorization", "Bearer " + testService.getAdminJWT())
                 .content(jo.toString()));
 
-        mvc.perform(MockMvcRequestBuilders.get("/user/balance_change_records")
+        mvc.perform(MockMvcRequestBuilders.get("/balance_change_records")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
     }

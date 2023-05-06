@@ -9,7 +9,7 @@ public class UserBalanceChangeRequest {
     @NotNull
     private String userId;
 
-    @Min(0)
+    @Min(1)
     @NotNull
     private Integer userBalance;
 
