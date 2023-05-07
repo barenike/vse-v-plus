@@ -77,15 +77,13 @@ public class ImageService {
                 extension.equals("png")
                         || extension.equals("jpg")
                         || extension.equals("jpeg")
-                        || extension.equals("webp")
-                        || extension.equals("svg"));
+                        || extension.equals("webp"));
     }
 
     private boolean isSupportedContentType(String contentType) {
         return contentType.equals("image/png")
                 || contentType.equals("image/jpg")
                 || contentType.equals("image/jpeg")
-                || contentType.equals("image/webp")
-                || contentType.equals("image/svg+xml");
+                || contentType.equals("image/webp");
     }
 }

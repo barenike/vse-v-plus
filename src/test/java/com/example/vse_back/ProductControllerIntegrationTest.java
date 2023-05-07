@@ -58,7 +58,7 @@ class ProductControllerIntegrationTest {
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
             parameters.add("productId", testService.getProductId());
-            parameters.add("name", "Test product");
+            parameters.add("name", "test_image");
             parameters.add("price", "100");
             parameters.add("description", "Test product description");
             parameters.add("amount", "10");
