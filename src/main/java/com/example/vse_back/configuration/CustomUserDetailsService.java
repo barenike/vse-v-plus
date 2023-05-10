@@ -2,6 +2,7 @@ package com.example.vse_back.configuration;
 
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.service.UserService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         UserEntity user = userService.getUserById(userId);
-        return CustomUserDetails.fromUserEntityToCustomUserDetails(user);
+        return new CustomUserDetails(user, new SimpleGrantedAuthority(user.getRole().getName()));
     }
 }

@@ -19,7 +19,7 @@ public class OrderDetailService {
         this.productService = productService;
     }
 
-    public void createOrderDetail(List<OrderCreationDetails> orderCreationDetails, OrderEntity order) {
+    public void createOrderDetails(List<OrderCreationDetails> orderCreationDetails, OrderEntity order) {
         for (OrderCreationDetails detail : orderCreationDetails) {
             OrderDetailEntity orderDetail = new OrderDetailEntity();
             orderDetail.setOrder(order);

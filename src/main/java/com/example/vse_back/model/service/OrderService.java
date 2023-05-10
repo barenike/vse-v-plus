@@ -44,7 +44,7 @@ public class OrderService {
         }
         order.setTotal(total);
         orderRepository.save(order);
-        orderDetailService.createOrderDetail(orderCreationDetails, order);
+        orderDetailService.createOrderDetails(orderCreationDetails, order);
         productService.setupProductAmount(orderCreationDetails);
         userService.changeUserBalance(user, user, userBalance - total, "Оформление заказа");
     }

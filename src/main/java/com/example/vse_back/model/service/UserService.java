@@ -2,6 +2,7 @@ package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.EntityIsNotFoundException;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
+import com.example.vse_back.infrastructure.user.ChangeIsEnabledFieldRequest;
 import com.example.vse_back.infrastructure.user.UserInfoChangeRequest;
 import com.example.vse_back.model.entity.ImageEntity;
 import com.example.vse_back.model.entity.RoleEntity;
@@ -48,14 +49,9 @@ public class UserService {
         return user;
     }
 
-    // isActivated (were there at least one successful login?) and isBlocked(is user allowed to access his/her account?)
-    public void enableUser(UserEntity user) {
-        user.setEnabled(true);
-        userRepository.save(user);
-    }
-
-    public void disableUser(UserEntity user) {
-        user.setEnabled(false);
+    public void changeIsEnabledField(ChangeIsEnabledFieldRequest request) {
+        UserEntity user = getUserById(request.getUserId());
+        user.setEnabled(request.isEnabled());
         userRepository.save(user);
     }
 

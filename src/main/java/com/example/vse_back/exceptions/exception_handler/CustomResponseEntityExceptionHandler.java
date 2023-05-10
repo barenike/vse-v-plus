@@ -1,6 +1,7 @@
 package com.example.vse_back.exceptions.exception_handler;
 
 import com.example.vse_back.exceptions.*;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+@Log
 @RestControllerAdvice
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -26,14 +28,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             NotEnabledUserException.class,
             NotEnoughCoinsException.class,
             TooManyAuthAttemptsException.class,
+            UserIsDisabledException.class,
             UserIsNotFoundException.class
     })
     public ResponseEntity<Object> handleForbiddenException(Exception e, WebRequest request) {
+        logger.error(e.getMessage());
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(value = {Exception.class, RuntimeException.class})
     public ResponseEntity<Object> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        logger.error(e.getMessage());
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

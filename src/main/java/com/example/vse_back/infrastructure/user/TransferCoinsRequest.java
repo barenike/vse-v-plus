@@ -5,11 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class UserBalanceChangeRequest {
+public class TransferCoinsRequest {
     @NotNull
     private String userId;
 
-    @Min(0)
+    @Min(1)
     @NotNull
     private Integer userBalance;
 

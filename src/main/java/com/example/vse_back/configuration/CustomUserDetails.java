@@ -9,14 +9,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
-    private String email;
-    private Collection<? extends GrantedAuthority> grantedAuthorities;
+    private final transient UserEntity user;
+    private final Collection<? extends GrantedAuthority> grantedAuthorities;
 
-    public static CustomUserDetails fromUserEntityToCustomUserDetails(UserEntity user) {
-        CustomUserDetails c = new CustomUserDetails();
-        c.email = user.getEmail();
-        c.grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName()));
-        return c;
+    public CustomUserDetails(UserEntity user, SimpleGrantedAuthority grantedAuthorities) {
+        this.user = user;
+        this.grantedAuthorities = Collections.singletonList(grantedAuthorities);
     }
 
     @Override
@@ -31,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return user.getEmail();
     }
 
     @Override

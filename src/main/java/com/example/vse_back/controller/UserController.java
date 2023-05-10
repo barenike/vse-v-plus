@@ -1,10 +1,7 @@
 package com.example.vse_back.controller;
 
 import com.example.vse_back.configuration.jwt.JwtProvider;
-import com.example.vse_back.exceptions.AuthCodeHasExpiredException;
-import com.example.vse_back.exceptions.AuthCodeIsInvalidException;
-import com.example.vse_back.exceptions.AuthCodeIsNotFoundException;
-import com.example.vse_back.exceptions.UserIsNotFoundException;
+import com.example.vse_back.exceptions.*;
 import com.example.vse_back.infrastructure.user.*;
 import com.example.vse_back.model.entity.AuthCodeEntity;
 import com.example.vse_back.model.entity.UserEntity;
@@ -47,6 +44,9 @@ public class UserController {
         UserEntity user = userService.getUserByEmail(authEmailRequest.getEmail());
         if (user == null) {
             user = userService.createUser(authEmailRequest.getEmail());
+        }
+        if (!user.isEnabled()) {
+            throw new UserIsDisabledException();
         }
         authCodeService.deleteByUserId(user.getId());
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user));
@@ -130,6 +130,14 @@ public class UserController {
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
+    // Test is needed
+    @Operation(summary = "Change the isEnabled field")
+    @DeleteMapping("/admin/is_enabled/{userId}")
+    public ResponseEntity<Object> changeIsEnabledField(@RequestBody @Valid ChangeIsEnabledFieldRequest request) {
+        userService.changeIsEnabledField(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @Operation(summary = "Change the user's balance")
     @PostMapping("/admin/user_balance")
     public ResponseEntity<Object> changeUserBalance(@RequestHeader(name = "Authorization") String token,
@@ -144,11 +152,11 @@ public class UserController {
     @Operation(summary = "Transfer coins to other user")
     @PostMapping("/user/transfer")
     public ResponseEntity<Object> transferCoins(@RequestHeader(name = "Authorization") String token,
-                                                @RequestBody @Valid UserBalanceChangeRequest userBalanceChangeRequest) {
+                                                @RequestBody @Valid TransferCoinsRequest transferCoinsRequest) {
         UserEntity subjectUser = localUtil.getUserFromToken(token);
-        String userId = userBalanceChangeRequest.getUserId();
+        String userId = transferCoinsRequest.getUserId();
         UserEntity objectUser = userService.getUserById(userId);
-        userService.transferCoins(objectUser, subjectUser, userBalanceChangeRequest.getUserBalance(), userBalanceChangeRequest.getCause());
+        userService.transferCoins(objectUser, subjectUser, transferCoinsRequest.getUserBalance(), transferCoinsRequest.getCause());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

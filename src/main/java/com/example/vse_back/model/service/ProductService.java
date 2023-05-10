@@ -76,10 +76,13 @@ public class ProductService {
     }
 
     public void setupProductAmount(List<OrderCreationDetails> orderCreationDetails) {
-        orderCreationDetails.forEach(detail -> {
+        for (OrderCreationDetails detail : orderCreationDetails) {
             ProductEntity product = getProductById(UUID.fromString(detail.getProductId()));
+            if (product.getAmount() < detail.getQuantity()) {
+                throw new RuntimeException(); // Create custom exception
+            }
             setupProductAmount(product, product.getAmount() - detail.getQuantity());
-        });
+        }
     }
 
     // I think that I shouldn't delete the product in the case that it has at least one order
