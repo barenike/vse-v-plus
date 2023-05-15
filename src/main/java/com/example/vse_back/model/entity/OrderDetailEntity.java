@@ -19,7 +19,6 @@ import java.util.UUID;
 public class OrderDetailEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue
     @UuidGenerator
     private UUID id;
 

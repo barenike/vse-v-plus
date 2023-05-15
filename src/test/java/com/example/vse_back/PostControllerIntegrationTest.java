@@ -78,7 +78,7 @@ class PostControllerIntegrationTest {
     @Test
     void getAllPosts_Returns_200() throws Exception {
         testService.createPost();
-        mvc.perform(MockMvcRequestBuilders.get("/posts")
+        mvc.perform(MockMvcRequestBuilders.get("/common/posts")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }

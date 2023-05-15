@@ -1,6 +1,7 @@
 package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.EntityIsNotFoundException;
+import com.example.vse_back.exceptions.NotEnoughProductException;
 import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
 import com.example.vse_back.infrastructure.product.ProductChangeRequest;
 import com.example.vse_back.infrastructure.product.ProductCreationRequest;
@@ -27,7 +28,7 @@ public class ProductService {
     public List<ProductResponse> getAllProducts() {
         final List<ProductEntity> products = productRepository.findAll();
         return products.stream().map(product -> new ProductResponse(
-                product.getId().toString(),
+                product.getId(),
                 product.getName(),
                 product.getPrice(),
                 product.getImage()
@@ -37,7 +38,7 @@ public class ProductService {
     public ProductEntity getProductById(UUID id) {
         ProductEntity product = productRepository.findByProductId(id);
         if (product == null) {
-            throw new EntityIsNotFoundException("product", id.toString());
+            throw new EntityIsNotFoundException("product", id);
         }
         return product;
     }
@@ -54,7 +55,7 @@ public class ProductService {
     }
 
     public void changeProduct(ProductChangeRequest productChangeRequest) {
-        ProductEntity product = getProductById(UUID.fromString(productChangeRequest.getProductId()));
+        ProductEntity product = getProductById(productChangeRequest.getProductId());
         product.setName(productChangeRequest.getName());
         product.setPrice(productChangeRequest.getPrice());
         product.setDescription(productChangeRequest.getDescription());
@@ -77,9 +78,11 @@ public class ProductService {
 
     public void setupProductAmount(List<OrderCreationDetails> orderCreationDetails) {
         for (OrderCreationDetails detail : orderCreationDetails) {
-            ProductEntity product = getProductById(UUID.fromString(detail.getProductId()));
-            if (product.getAmount() < detail.getQuantity()) {
-                throw new RuntimeException(); // Create custom exception
+            ProductEntity product = getProductById(detail.getProductId());
+            Integer wantedAmount = detail.getQuantity();
+            Integer realAmount = product.getAmount();
+            if (realAmount < wantedAmount) {
+                throw new NotEnoughProductException(product.getId(), wantedAmount, realAmount);
             }
             setupProductAmount(product, product.getAmount() - detail.getQuantity());
         }

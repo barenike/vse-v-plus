@@ -3,6 +3,7 @@ package com.example.vse_back.controller;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
 import com.example.vse_back.model.entity.OrderEntity;
 import com.example.vse_back.model.entity.UserEntity;
+import com.example.vse_back.model.enums.OrderStatusEnum;
 import com.example.vse_back.model.service.OrderService;
 import com.example.vse_back.model.service.utils.LocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +55,7 @@ public class OrderController {
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
+    // Refactor
     @Operation(summary = "no parameters - get all orders from all users; " +
             "userId parameter - get all orders from the user; " +
             "orderId parameter - delete the order; " +
@@ -62,7 +64,7 @@ public class OrderController {
     public ResponseEntity<List<OrderEntity>> manipulateOrders(@RequestHeader(name = "Authorization") String token,
                                                               @RequestParam(value = "userId", required = false) UUID userId,
                                                               @RequestParam(value = "orderId", required = false) UUID orderId,
-                                                              @RequestParam(value = "status", required = false) String status) {
+                                                              @RequestParam(value = "status", required = false) OrderStatusEnum status) {
         if (userId == null && orderId == null) {
             final List<OrderEntity> orders = orderService.getAllOrders();
             return getListResponseEntity(orders);

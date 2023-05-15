@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Service
 public class LocalUtil {
@@ -26,7 +27,7 @@ public class LocalUtil {
     }
 
     public UserEntity getUserFromToken(String token) {
-        String userId = jwtProvider.getUserIdFromRawToken(token);
+        UUID userId = jwtProvider.getUserIdFromRawToken(token);
         return userService.getUserById(userId);
     }
 }

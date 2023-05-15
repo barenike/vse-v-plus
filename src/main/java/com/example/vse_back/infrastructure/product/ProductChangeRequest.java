@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @Data
 public class ProductChangeRequest {
     @NotNull
-    private String productId;
+    private UUID productId;
 
     @NotNull
     private String name;

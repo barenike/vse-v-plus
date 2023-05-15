@@ -35,7 +35,7 @@ public class UserBadgeController {
     }
 
     @Operation(summary = "Get badges of the user")
-    @GetMapping("/user_badges/{userId}")
+    @GetMapping("/common/user_badges/{userId}")
     public ResponseEntity<List<UserBadgeEntity>> getUserBadges(@PathVariable(name = "userId") UUID userId) {
         final List<UserBadgeEntity> userBadges = userBadgeService.getUserBadgesByUserId(userId);
         return userBadges != null && !userBadges.isEmpty()

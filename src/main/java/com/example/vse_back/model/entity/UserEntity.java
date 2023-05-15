@@ -9,6 +9,8 @@ import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,7 +22,6 @@ import java.util.UUID;
 public class UserEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue
     @UuidGenerator
     private UUID id;
 
@@ -60,8 +61,13 @@ public class UserEntity {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private AuthCodeEntity authCode;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @ManyToMany(mappedBy = "participants")
+    private List<EventEntity> events = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

@@ -46,79 +46,22 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void authCode_Returns_200() throws Exception {
-        testService.createTestAccount();
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.testUserEmail);
-        jo.put("code", testService.getCode());
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void authCode_Returns_403_When_ThereIsNoUserWithThisEmail() throws Exception {
-        testService.createTestAccount();
-        JSONObject jo = new JSONObject();
-        jo.put("email", "fake-email@mail.ru");
-        jo.put("code", testService.getCode());
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isForbidden());
-    }
-
-    // Can falsely fail with probability 1 / 1 000 000
-    @Test
-    void authCode_Returns_403_When_AuthCodeIsInvalid() throws Exception {
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.userEmail);
-        jo.put("code", "000000");
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isForbidden());
-    }
-
-    // Can falsely fail with probability 3 / 1 000 000
-    @Test
-    void authCode_Returns_403_When_TooManyAuthAttempts() throws Exception {
-        JSONObject jo = new JSONObject();
-        jo.put("email", testService.userEmail);
-        jo.put("code", "000000");
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jo.toString()));
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jo.toString()));
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jo.toString()));
-        mvc.perform(MockMvcRequestBuilders.post("/auth/code")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jo.toString()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void getMyInfo_Returns_200() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/info")
+        mvc.perform(MockMvcRequestBuilders.get("/common/info")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getAllUsersInfo_Returns_200() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/info/all_users")
+        mvc.perform(MockMvcRequestBuilders.get("/common/info/all_users")
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getFullUserInfo_Returns_200() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/info/{userId}", testService.getUserId())
+        mvc.perform(MockMvcRequestBuilders.get("/common/info/{userId}", testService.getUserId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }
@@ -133,7 +76,7 @@ class UserControllerIntegrationTest {
             parameters.add("lastName", testService.lastName);
             parameters.add("jobTitle", testService.jobTitle);
             parameters.add("infoAbout", testService.infoAbout);
-            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+            mvc.perform(MockMvcRequestBuilders.multipart("/common/info/change")
                             .file(file)
                             .params(parameters)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -144,7 +87,7 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void changeMyInfo_Returns_200_WhenFileIsSetInsteadOfExistingFile() throws Exception {
+    void changeMyInfo_Returns_200_WhenNewFileIsSetInsteadOfExistingFile() throws Exception {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_image.jpg")) {
             MockMultipartFile file = new MockMultipartFile("file", "test_image.jpg", "application/json", inputStream);
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
@@ -153,12 +96,12 @@ class UserControllerIntegrationTest {
             parameters.add("lastName", testService.lastName);
             parameters.add("jobTitle", testService.jobTitle);
             parameters.add("infoAbout", testService.infoAbout);
-            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+            mvc.perform(MockMvcRequestBuilders.multipart("/common/info/change")
                     .file(file)
                     .params(parameters)
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + testService.getUserJWT()));
-            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+            mvc.perform(MockMvcRequestBuilders.multipart("/common/info/change")
                             .file(file)
                             .params(parameters)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -178,7 +121,7 @@ class UserControllerIntegrationTest {
             parameters.add("lastName", testService.lastName);
             parameters.add("jobTitle", testService.jobTitle);
             parameters.add("infoAbout", testService.infoAbout);
-            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+            mvc.perform(MockMvcRequestBuilders.multipart("/common/info/change")
                     .file(file)
                     .params(parameters)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -189,7 +132,7 @@ class UserControllerIntegrationTest {
             nullParameters.add("lastName", null);
             nullParameters.add("jobTitle", null);
             nullParameters.add("infoAbout", null);
-            mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+            mvc.perform(MockMvcRequestBuilders.multipart("/common/info/change")
                             .params(nullParameters)
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + testService.getUserJWT()))
@@ -208,14 +151,6 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void deleteUser_Returns_304_When_UserIsNotFound() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                        .delete("/admin/{userId}", "c4f44950-2b80-4cf0-a060-ad99d19cc636")
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isNotModified());
-    }
-
-    @Test
     void changeUserBalance_Returns_200() throws Exception {
         UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
@@ -230,25 +165,23 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void changeUserBalance_Returns_403_When_UserIsNotFound() throws Exception {
+    void changeIsEnabledField_Returns_200() throws Exception {
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
         JSONObject jo = new JSONObject();
-        jo.put("userId", "c4f44950-2b80-4cf0-a060-ad99d19cc636");
-        jo.put("userBalance", 200);
-        jo.put("cause", "Тест");
-        mvc.perform(MockMvcRequestBuilders.post("/admin/user_balance")
+        jo.put("userId", user.getId().toString());
+        jo.put("isEnabled", false);
+        mvc.perform(MockMvcRequestBuilders.post("/admin/is_enabled")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + testService.getAdminJWT())
                         .content(jo.toString()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
     }
 
     @Test
     void transferCoins_Returns_200() throws Exception {
         UserEntity user = userService.getUserByEmail(testService.userEmail);
         user.setUserBalance(200);
-
         testService.createTestAccount();
-
         JSONObject jo = new JSONObject();
         jo.put("userId", testService.getTestUserId());
         jo.put("userBalance", 200);
@@ -264,12 +197,26 @@ class UserControllerIntegrationTest {
     void transferCoins_Returns_403_When_NotEnoughCoins() throws Exception {
         UserEntity user = userService.getUserByEmail(testService.userEmail);
         user.setUserBalance(200);
-
         testService.createTestAccount();
-
         JSONObject jo = new JSONObject();
         jo.put("userId", testService.getTestUserId());
         jo.put("userBalance", 201);
+        jo.put("cause", "Тест");
+        mvc.perform(MockMvcRequestBuilders.post("/user/transfer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + testService.getUserJWT())
+                        .content(jo.toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void transferCoins_Returns_403_When_TransferCoinsToYourself() throws Exception {
+        UserEntity user = userService.getUserByEmail(testService.userEmail);
+        user.setUserBalance(200);
+        testService.createTestAccount();
+        JSONObject jo = new JSONObject();
+        jo.put("userId", user.getId());
+        jo.put("userBalance", 200);
         jo.put("cause", "Тест");
         mvc.perform(MockMvcRequestBuilders.post("/user/transfer")
                         .contentType(MediaType.APPLICATION_JSON)

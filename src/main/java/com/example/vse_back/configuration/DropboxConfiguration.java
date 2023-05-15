@@ -23,7 +23,6 @@ class DropboxConfiguration {
 
     @Bean
     public DbxClientV2 dropboxClient() {
-        // udv_store?
         DbxRequestConfig config = DbxRequestConfig.newBuilder("udv_store").build();
         DbxCredential credentials = new DbxCredential(accessToken, -1L, refreshToken, appKey, appSecret);
         return new DbxClientV2(config, credentials);

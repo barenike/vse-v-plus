@@ -18,7 +18,6 @@ import java.util.UUID;
 public class BadgeEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue
     @UuidGenerator
     private UUID id;
 

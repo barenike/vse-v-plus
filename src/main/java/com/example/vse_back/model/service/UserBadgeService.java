@@ -51,7 +51,7 @@ public class UserBadgeService {
     public UserBadgeEntity getUserBadgeById(UUID id) {
         UserBadgeEntity userBadge = userBadgeRepository.findByUserBadgeId(id);
         if (userBadge == null) {
-            throw new EntityIsNotFoundException("user badge", id.toString());
+            throw new EntityIsNotFoundException("user badge", id);
         }
         return userBadge;
     }
@@ -61,7 +61,7 @@ public class UserBadgeService {
     }
 
     public void changeUserBadgeStatus(UserBadgeStatusChangeRequest request) {
-        UserBadgeEntity userBadge = getUserBadgeById(UUID.fromString(request.getUserBadgeId()));
+        UserBadgeEntity userBadge = getUserBadgeById(request.getUserBadgeId());
         userBadge.setIsActivated(request.isActivated());
         userBadgeRepository.save(userBadge);
     }

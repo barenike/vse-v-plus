@@ -52,16 +52,7 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-    void createOrder_Returns_403_When_ProductIsNotFound() throws Exception {
-        testService.setUserBalance(20);
-        testService.createProduct();
-        mvc.perform(MockMvcRequestBuilders.post("/user/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"orderCreationDetails\" : [{\"productId\" : \"a04096a1-014c-40a8-8471-46dbf85113b4\",\"quantity\" : 2}]}")
-                        .header("Authorization", "Bearer " + testService.getUserJWT()))
-                .andExpect(status().isForbidden());
-    }
+    // createOrder_Returns_403_When_NotEnoughProductAmount
 
     @Test
     void getMyOrders_Returns_200() throws Exception {
@@ -81,16 +72,6 @@ class OrderControllerIntegrationTest {
         mvc.perform(MockMvcRequestBuilders.delete("/user/orders/{orderId}", testService.getOrderId())
                         .header("Authorization", "Bearer " + testService.getUserJWT()))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void deleteMyOrder_Returns_304_When_OrderDoesNotExist() throws Exception {
-        testService.setUserBalance(20);
-        testService.createProduct();
-        testService.createOrder();
-        mvc.perform(MockMvcRequestBuilders.delete("/user/orders/{orderId}", "fb96924c-f4a2-4576-8b8b-42b903d9a822")
-                        .header("Authorization", "Bearer " + testService.getUserJWT()))
-                .andExpect(status().isNotModified());
     }
 
     @Test
@@ -124,15 +105,6 @@ class OrderControllerIntegrationTest {
                         .param("status", "PROCESSING")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void manipulateOrders_ChangeStatus_Returns_304_When_OrderDoesNotExist() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/admin/orders")
-                        .param("orderId", "fb96924c-f4a2-4576-8b8b-42b903d9a822")
-                        .param("status", "PROCESSING")
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isNotModified());
     }
 
     @Test

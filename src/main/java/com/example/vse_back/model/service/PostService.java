@@ -36,7 +36,7 @@ public class PostService {
     }
 
     public void editPost(PostEditRequest postEditRequest) {
-        PostEntity post = getPostById(UUID.fromString(postEditRequest.getPostId()));
+        PostEntity post = getPostById(postEditRequest.getPostId());
         post.setTitle(postEditRequest.getTitle());
         post.setText(postEditRequest.getText());
         post.setImage(setupImage(post, postEditRequest.getFile()));
@@ -71,12 +71,15 @@ public class PostService {
     public PostEntity getPostById(UUID id) {
         PostEntity post = postRepository.findByPostId(id);
         if (post == null) {
-            throw new EntityIsNotFoundException("post", id.toString());
+            throw new EntityIsNotFoundException("post", id);
         }
         return post;
     }
 
-    public List<PostEntity> getPostByUserId(UUID userId) {
+    /**
+     * Only for tests
+     */
+    public List<PostEntity> getPostsByUserId(UUID userId) {
         return postRepository.findByUserId(userId);
     }
 

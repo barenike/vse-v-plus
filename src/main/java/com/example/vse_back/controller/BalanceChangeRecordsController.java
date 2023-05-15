@@ -26,11 +26,11 @@ public class BalanceChangeRecordsController {
     }
 
     @Operation(summary = "Get the list of user balance's change records")
-    @GetMapping("/balance_change_records")
+    @GetMapping("/common/balance_change_records")
     public ResponseEntity<List<BalanceChangeRecordEntity>> getUserBalanceChangeRecords(@RequestHeader(name = "Authorization") String token) {
         UserEntity user = localUtil.getUserFromToken(token);
         final List<BalanceChangeRecordEntity> userBalanceRecords
-                = balanceChangeRecordsService.getBalanceChangeRecordsByUserId(String.valueOf(user.getId()));
+                = balanceChangeRecordsService.getBalanceChangeRecordsByUserId(user.getId());
         return userBalanceRecords != null && !userBalanceRecords.isEmpty()
                 ? new ResponseEntity<>(userBalanceRecords, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);
@@ -39,7 +39,7 @@ public class BalanceChangeRecordsController {
     @Operation(summary = "Get the list of user balance's change records")
     @GetMapping("/admin/balance_change_records/{userId}")
     public ResponseEntity<List<BalanceChangeRecordEntity>> getUserBalanceChangeRecords(@PathVariable(name = "userId") UUID userId) {
-        final List<BalanceChangeRecordEntity> userBalanceRecords = balanceChangeRecordsService.getBalanceChangeRecordsByUserId(String.valueOf(userId));
+        final List<BalanceChangeRecordEntity> userBalanceRecords = balanceChangeRecordsService.getBalanceChangeRecordsByUserId(userId);
         return userBalanceRecords != null && !userBalanceRecords.isEmpty()
                 ? new ResponseEntity<>(userBalanceRecords, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.OK);

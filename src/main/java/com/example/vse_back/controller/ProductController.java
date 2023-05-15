@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Get all products")
-    @GetMapping("/products")
+    @GetMapping("/common/products")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         final List<ProductResponse> products = productService.getAllProducts();
         return products != null && !products.isEmpty()
@@ -48,7 +48,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Get the product")
-    @GetMapping("/products/{productId}")
+    @GetMapping("/common/products/{productId}")
     public ResponseEntity<ProductEntity> getProduct(@PathVariable(name = "productId") UUID productId) {
         final ProductEntity product = productService.getProductById(productId);
         return new ResponseEntity<>(product, HttpStatus.OK);

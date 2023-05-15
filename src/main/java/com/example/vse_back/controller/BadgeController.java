@@ -23,14 +23,14 @@ public class BadgeController {
 
     @Operation(summary = "Create a badge")
     @PostMapping("/admin/badge/create")
-    public ResponseEntity<BadgeCreationRequest> createBadge(@ModelAttribute @Valid BadgeCreationRequest badgeCreationRequest) {
+    public ResponseEntity<Object> createBadge(@ModelAttribute @Valid BadgeCreationRequest badgeCreationRequest) {
         badgeService.createBadge(badgeCreationRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "Edit the badge")
     @PostMapping("/admin/badge/edit")
-    public ResponseEntity<BadgeCreationRequest> editBadge(@ModelAttribute @Valid BadgeEditRequest badgeEditRequest) {
+    public ResponseEntity<Object> editBadge(@ModelAttribute @Valid BadgeEditRequest badgeEditRequest) {
         badgeService.editBadge(badgeEditRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -4,11 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @Data
 public class PostEditRequest {
-    // Length constraint???
     @NotNull
-    private String postId;
+    private UUID postId;
 
     @NotNull
     private String title;

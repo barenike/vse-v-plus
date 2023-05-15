@@ -16,6 +16,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @ExceptionHandler({ImageDeleteFromDropboxFailedException.class, ImageUploadToDropboxFailedException.class})
     public ResponseEntity<Object> handleInternalServerErrorException(ImageDeleteFromDropboxFailedException e, WebRequest request) {
+        logger.error(e.getMessage());
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
@@ -27,7 +28,9 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             InvalidImageException.class,
             NotEnabledUserException.class,
             NotEnoughCoinsException.class,
+            NotEnoughProductException.class,
             TooManyAuthAttemptsException.class,
+            TransferToItselfException.class,
             UserIsDisabledException.class,
             UserIsNotFoundException.class
     })

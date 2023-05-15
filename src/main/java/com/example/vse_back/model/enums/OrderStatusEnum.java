@@ -1,4 +1,4 @@
-package com.example.vse_back.model.entity;
+package com.example.vse_back.model.enums;
 
 public enum OrderStatusEnum {
     CREATED,

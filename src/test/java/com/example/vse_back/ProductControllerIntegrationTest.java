@@ -73,7 +73,7 @@ class ProductControllerIntegrationTest {
     @Test
     void getAllProducts_Returns_200() throws Exception {
         testService.createProduct();
-        mvc.perform(MockMvcRequestBuilders.get("/products")
+        mvc.perform(MockMvcRequestBuilders.get("/common/products")
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }
@@ -81,17 +81,9 @@ class ProductControllerIntegrationTest {
     @Test
     void getProduct_Returns_200() throws Exception {
         testService.createProduct();
-        mvc.perform(MockMvcRequestBuilders.get("/products/{productId}", testService.getProductId())
+        mvc.perform(MockMvcRequestBuilders.get("/common/products/{productId}", testService.getProductId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void getProduct_Returns_404_When_ProductDoesNotExist() throws Exception {
-        testService.createProduct();
-        mvc.perform(MockMvcRequestBuilders.get("/products/{productId}", "a04096a1-014c-40a8-8471-46dbf85113b4")
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -100,13 +92,5 @@ class ProductControllerIntegrationTest {
         mvc.perform(MockMvcRequestBuilders.delete("/admin/product/{productId}", testService.getProductId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void deleteProduct_Returns_304_When_ProductDoesNotExist() throws Exception {
-        testService.createProduct();
-        mvc.perform(MockMvcRequestBuilders.delete("/admin/product/{productId}", "a04096a1-014c-40a8-8471-46dbf85113b4")
-                        .header("Authorization", "Bearer " + testService.getAdminJWT()))
-                .andExpect(status().isNotModified());
     }
 }

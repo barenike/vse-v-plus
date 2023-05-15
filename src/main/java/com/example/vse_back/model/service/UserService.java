@@ -2,6 +2,7 @@ package com.example.vse_back.model.service;
 
 import com.example.vse_back.exceptions.EntityIsNotFoundException;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
+import com.example.vse_back.exceptions.TransferToItselfException;
 import com.example.vse_back.infrastructure.user.ChangeIsEnabledFieldRequest;
 import com.example.vse_back.infrastructure.user.UserInfoChangeRequest;
 import com.example.vse_back.model.entity.ImageEntity;
@@ -67,7 +68,7 @@ public class UserService {
         Integer subjectUserBalance = subjectUser.getUserBalance();
 
         if (objectUser.getId().equals(subjectUser.getId())) {
-            throw new RuntimeException(); // Create custom exception
+            throw new TransferToItselfException();
         } else if (subjectUserBalance < transferSum) {
             throw new NotEnoughCoinsException(subjectUserBalance);
         }
@@ -103,8 +104,8 @@ public class UserService {
         return null;
     }
 
-    public UserEntity getUserById(String id) {
-        UserEntity user = userRepository.findByUserId(UUID.fromString(id));
+    public UserEntity getUserById(UUID id) {
+        UserEntity user = userRepository.findByUserId(id);
         if (user == null) {
             throw new EntityIsNotFoundException("user", id);
         }
@@ -119,9 +120,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    // Do I need this? Should I even allow to delete users?
     public boolean deleteUserById(UUID id) {
         if (userRepository.existsById(id)) {
-            ImageEntity image = getUserById(String.valueOf(id)).getImage();
+            ImageEntity image = getUserById(id).getImage();
             userRepository.deleteById(id);
             if (image != null) {
                 imageService.deleteImage(image.getId());

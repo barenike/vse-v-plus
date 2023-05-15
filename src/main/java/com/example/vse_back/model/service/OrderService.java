@@ -3,7 +3,11 @@ package com.example.vse_back.model.service;
 import com.example.vse_back.exceptions.NotEnoughCoinsException;
 import com.example.vse_back.infrastructure.order.OrderCreationRequest;
 import com.example.vse_back.infrastructure.order_detail.OrderCreationDetails;
-import com.example.vse_back.model.entity.*;
+import com.example.vse_back.model.entity.OrderDetailEntity;
+import com.example.vse_back.model.entity.OrderEntity;
+import com.example.vse_back.model.entity.ProductEntity;
+import com.example.vse_back.model.entity.UserEntity;
+import com.example.vse_back.model.enums.OrderStatusEnum;
 import com.example.vse_back.model.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,22 +56,22 @@ public class OrderService {
     private Integer getTotal(List<OrderCreationDetails> orderCreationDetails) {
         int total = 0;
         for (OrderCreationDetails orderCreationDetail : orderCreationDetails) {
-            String productId = orderCreationDetail.getProductId();
-            ProductEntity product = productService.getProductById(UUID.fromString(productId));
+            UUID productId = orderCreationDetail.getProductId();
+            ProductEntity product = productService.getProductById(productId);
             total += product.getPrice() * orderCreationDetail.getQuantity();
         }
         return total;
     }
 
-    public boolean changeOrderStatus(UUID id, String status) {
+    public boolean changeOrderStatus(UUID id, OrderStatusEnum status) {
         if (orderRepository.existsById(id)) {
             OrderEntity order = orderRepository.getReferenceById(id);
-            order.setStatus(OrderStatusEnum.valueOf(status).toString());
-            if (OrderStatusEnum.CREATED.toString().equals(status)) {
+            order.setStatus(status.toString());
+            if (OrderStatusEnum.CREATED.equals(status)) {
                 order.setCreationDate(getCurrentMoscowDate());
-            } else if (OrderStatusEnum.PROCESSING.toString().equals(status)) {
+            } else if (OrderStatusEnum.PROCESSING.equals(status)) {
                 order.setProcessingDate(getCurrentMoscowDate());
-            } else if (OrderStatusEnum.COMPLETED.toString().equals(status)) {
+            } else if (OrderStatusEnum.COMPLETED.equals(status)) {
                 order.setCompletionDate(getCurrentMoscowDate());
             }
             orderRepository.save(order);

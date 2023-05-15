@@ -1,6 +1,9 @@
 package com.example.vse_back.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -18,7 +21,6 @@ import java.util.UUID;
 public class ImageEntity {
     @Id
     @Column(unique = true, name = "id", nullable = false)
-    @GeneratedValue
     @UuidGenerator
     private UUID id;
 

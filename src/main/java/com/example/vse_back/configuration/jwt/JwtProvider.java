@@ -10,6 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @Log
@@ -50,7 +51,7 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
-    public String getUserIdFromRawToken(String token) {
-        return getUserIdFromToken(token.substring(7));
+    public UUID getUserIdFromRawToken(String token) {
+        return UUID.fromString(getUserIdFromToken(token.substring(7)));
     }
 }

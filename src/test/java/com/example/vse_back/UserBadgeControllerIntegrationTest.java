@@ -42,7 +42,7 @@ class UserBadgeControllerIntegrationTest {
     @Test
     void getUserBadges_Returns_200() throws Exception {
         testService.createBadge();
-        mvc.perform(MockMvcRequestBuilders.get("/user_badges/{userId}", testService.getUserId())
+        mvc.perform(MockMvcRequestBuilders.get("/common/user_badges/{userId}", testService.getUserId())
                         .header("Authorization", "Bearer " + testService.getAdminJWT()))
                 .andExpect(status().isOk());
     }

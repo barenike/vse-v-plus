@@ -5,6 +5,7 @@ import com.example.vse_back.model.entity.AuthCodeEntity;
 import com.example.vse_back.model.entity.UserEntity;
 import com.example.vse_back.model.repository.AuthCodeRepository;
 import com.example.vse_back.model.service.utils.LocalUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -12,23 +13,22 @@ import java.util.UUID;
 @Service
 public class AuthCodeService {
     private final AuthCodeRepository authCodeRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthCodeService(AuthCodeRepository authCodeRepository) {
+    public AuthCodeService(AuthCodeRepository authCodeRepository, PasswordEncoder passwordEncoder) {
         this.authCodeRepository = authCodeRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void createCode(UserEntity user, String code) {
         AuthCodeEntity authCode = new AuthCodeEntity();
-        authCode.setUser(user);
-        authCode.setCode(code);
+        authCode.setId(user.getId());
+        authCode.setCode(passwordEncoder.encode(code));
         authCode.setDate(LocalUtil.getCurrentMoscowDate());
         authCode.setAttemptCount(0);
         authCodeRepository.save(authCode);
     }
 
-    /**
-     * Null-unsafe
-     */
     public AuthCodeEntity getAuthCodeByUserId(UUID userId) {
         return authCodeRepository.findByUserId(userId);
     }

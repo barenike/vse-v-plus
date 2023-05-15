@@ -23,7 +23,7 @@ public class OrderDetailService {
         for (OrderCreationDetails detail : orderCreationDetails) {
             OrderDetailEntity orderDetail = new OrderDetailEntity();
             orderDetail.setOrder(order);
-            orderDetail.setProduct(productService.getProductById(UUID.fromString(detail.getProductId())));
+            orderDetail.setProduct(productService.getProductById(detail.getProductId()));
             orderDetail.setQuantity(detail.getQuantity());
             orderDetailRepository.save(orderDetail);
         }

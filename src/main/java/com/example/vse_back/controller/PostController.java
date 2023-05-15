@@ -27,8 +27,8 @@ public class PostController {
 
     @Operation(summary = "Create the post")
     @PostMapping("/admin/post")
-    public ResponseEntity<PostCreationRequest> createPost(@RequestHeader(name = "Authorization") String token,
-                                                          @ModelAttribute @Valid PostCreationRequest postCreationRequest) {
+    public ResponseEntity<Object> createPost(@RequestHeader(name = "Authorization") String token,
+                                             @ModelAttribute @Valid PostCreationRequest postCreationRequest) {
         UserEntity user = localUtil.getUserFromToken(token);
         postService.createPost(postCreationRequest, user);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -37,7 +37,7 @@ public class PostController {
     // Tests are needed!
     @Operation(summary = "Edit the post")
     @PostMapping("/admin/post/edit")
-    public ResponseEntity<PostCreationRequest> editPost(@ModelAttribute @Valid PostEditRequest postEditRequest) {
+    public ResponseEntity<Object> editPost(@ModelAttribute @Valid PostEditRequest postEditRequest) {
         postService.editPost(postEditRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -52,7 +52,7 @@ public class PostController {
     }
 
     @Operation(summary = "Get all posts")
-    @GetMapping("/posts")
+    @GetMapping("/common/posts")
     public ResponseEntity<List<PostEntity>> getAllProducts() {
         final List<PostEntity> posts = postService.getAllPosts();
         return posts != null && !posts.isEmpty()

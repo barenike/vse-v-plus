@@ -28,7 +28,7 @@ public class ImageService {
         }
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String name = UUID.randomUUID().toString();
+        UUID name = UUID.randomUUID();
         String imagePath = String.format("/%s.%s", name, extension);
         String imageUrl;
 

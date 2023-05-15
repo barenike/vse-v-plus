@@ -4,7 +4,6 @@ import com.example.vse_back.configuration.jwt.JwtProvider;
 import com.example.vse_back.infrastructure.product.ProductResponse;
 import com.example.vse_back.model.entity.*;
 import com.example.vse_back.model.service.*;
-import com.example.vse_back.model.service.email_verification.AuthCodeService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -40,8 +39,6 @@ public class TestService {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private AuthCodeService authCodeService;
-    @Autowired
     private PostService postService;
     @Autowired
     private BadgeService badgeService;
@@ -65,14 +62,10 @@ public class TestService {
         nullParameters.add("lastName", null);
         nullParameters.add("jobTitle", null);
         nullParameters.add("infoAbout", null);
-        mvc.perform(MockMvcRequestBuilders.multipart("/info/change")
+        mvc.perform(MockMvcRequestBuilders.multipart("/common/info/change")
                 .params(nullParameters)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + getUserJWT()));
-    }
-
-    String getCode() {
-        return authCodeService.getAuthCodeByUserId(getTestUserId()).getCode();
     }
 
     UUID getTestUserId() {
@@ -124,14 +117,12 @@ public class TestService {
 
     String getProductId() {
         List<ProductResponse> productResponseList = productService.getAllProducts();
-        String productId;
-        productId = productResponseList
+        return productResponseList
                 .stream()
                 .filter(productResponse -> productResponse.getName().equals("test_image"))
                 .findFirst()
-                .map(ProductResponse::getId)
+                .map(productResponse -> productResponse.getId().toString())
                 .orElse(null);
-        return productId;
     }
 
     void deleteProduct() {
@@ -167,7 +158,7 @@ public class TestService {
     }
 
     UUID getPostId() {
-        List<PostEntity> posts = postService.getPostByUserId(getAdminId());
+        List<PostEntity> posts = postService.getPostsByUserId(getAdminId());
         if (posts.size() == 0) {
             return null;
         }

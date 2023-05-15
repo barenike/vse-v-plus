@@ -35,7 +35,7 @@ public class BadgeService {
     }
 
     public void editBadge(BadgeEditRequest badgeEditRequest) {
-        BadgeEntity badge = getBadgeById(UUID.fromString(badgeEditRequest.getBadgeId()));
+        BadgeEntity badge = getBadgeById(badgeEditRequest.getBadgeId());
         badge.setName(badgeEditRequest.getName());
         badge.setDescription(badgeEditRequest.getDescription());
         badge.setImage(setupImage(badge, badgeEditRequest.getFile()));
@@ -63,7 +63,7 @@ public class BadgeService {
     public BadgeEntity getBadgeById(UUID id) {
         BadgeEntity badge = badgeRepository.findByBadgeId(id);
         if (badge == null) {
-            throw new EntityIsNotFoundException("badge", id.toString());
+            throw new EntityIsNotFoundException("badge", id);
         }
         return badge;
     }

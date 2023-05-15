@@ -45,7 +45,7 @@ public class OrderDetailController {
     public ResponseEntity<List<OrderDetailEntity>> getOrderDetailById(@PathVariable(name = "orderDetailId") UUID orderDetailId) {
         final List<OrderDetailEntity> orderDetails = orderDetailService.getAllOrderDetailsById(orderDetailId);
         if (orderDetails.isEmpty()) {
-            throw new EntityIsNotFoundException("order detail", orderDetailId.toString());
+            throw new EntityIsNotFoundException("order detail", orderDetailId);
         }
         return new ResponseEntity<>(orderDetails, HttpStatus.OK);
     }
