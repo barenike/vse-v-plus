@@ -13,7 +13,9 @@ public class CorsConfiguration implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:8080")
+                        // Change to static IP (get from application.yaml variable)
+                        .allowedOriginPatterns("*")
+                        //.allowedOrigins("http://localhost:8080")
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true);

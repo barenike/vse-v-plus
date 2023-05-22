@@ -19,6 +19,7 @@ target/
 *.iml
 *.ipr
 src/main/resources/application.yaml
+src/main/resources/yandex_cloud.crt
 
 ### NetBeans ###
 /nbproject/private/
